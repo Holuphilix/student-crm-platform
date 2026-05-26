@@ -7,10 +7,14 @@ import "./index.css";
 import { QueryProvider } from "@/app/providers/query-provider";
 import { router } from "@/app/router/router";
 
+import { AuthProvider } from "@/features/auth/providers/auth-provider";
+
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryProvider>
-      <RouterProvider router={router} />
+      <AuthProvider>
+        <RouterProvider router={router} />
+      </AuthProvider>
     </QueryProvider>
   </React.StrictMode>
 );
