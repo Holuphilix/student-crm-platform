@@ -444,3 +444,222 @@ Successfully implemented:
 * functional login workflow
 * authenticated dashboard access
 
+## ✅ Task 3 — Application Layout System
+
+### Objective
+
+Build the authenticated application shell architecture for the CRM platform.
+
+This task establishes the foundational dashboard experience used across authenticated areas of the application.
+
+The goal of this phase was to implement:
+
+* reusable layout architecture
+* sidebar navigation system
+* authenticated application shell
+* scalable route structure
+* centralized navigation management
+* production-style dashboard layout
+
+## Application Layout Architecture
+
+The application layout system was designed using reusable layout components to ensure scalability and maintainability as the CRM grows.
+
+Implemented layout components:
+
+```txt
+components/layout/
+├── app-layout.tsx
+├── app-sidebar.tsx
+└── app-header.tsx
+```
+
+## Implemented Features
+
+### Sidebar Navigation System
+
+Built a reusable sidebar navigation architecture using:
+
+* shadcn/ui sidebar components
+* React Router navigation
+* Lucide React icons
+* centralized navigation configuration
+
+Navigation sections implemented:
+
+* Dashboard
+* Clients
+* Conversations
+* Deals
+* Settings
+
+### Centralized Navigation Configuration
+
+Navigation items were abstracted into:
+
+```txt
+lib/navigation/navigation.config.ts
+```
+
+This approach avoids hardcoded navigation logic directly inside UI components.
+
+Benefits:
+
+* easier scalability
+* reusable navigation rendering
+* cleaner sidebar architecture
+* easier future role-based access implementation
+* improved maintainability
+
+### Application Header System
+
+Implemented reusable authenticated header containing:
+
+* application title
+* platform description
+* logout functionality
+
+Logout handling is connected directly to:
+
+```ts
+supabase.auth.signOut()
+```
+
+This automatically:
+
+* clears user session
+* updates AuthProvider state
+* revalidates protected routes
+* redirects users to login
+
+### Authenticated Application Shell
+
+Built reusable application shell architecture using:
+
+```tsx
+<AppLayout>
+```
+
+The layout provides:
+
+* sidebar rendering
+* responsive application structure
+* shared authenticated UI
+* centralized page rendering
+
+All protected application pages now render inside the shared application shell.
+
+## Layout Rendering Architecture
+
+```mermaid
+graph TD
+
+A[Protected Route] --> B[App Layout]
+
+B --> C[Sidebar Navigation]
+B --> D[Application Header]
+B --> E[Page Content]
+
+E --> F[Dashboard Page]
+E --> G[Clients Page]
+E --> H[Deals Page]
+E --> I[Conversations Page]
+E --> J[Settings Page]
+```
+## Navigation Rendering Architecture
+
+The sidebar navigation uses configuration-driven rendering.
+
+```tsx
+navigationItems.map()
+```
+
+This pattern enables scalable SaaS-style navigation systems commonly used in production dashboard applications.
+
+Benefits include:
+
+* dynamic navigation rendering
+* centralized navigation logic
+* future permission-aware routing
+* reusable UI architecture
+
+## Route Architecture
+
+Protected application routes were expanded to support multiple authenticated pages.
+
+Implemented routes:
+
+```txt
+/
+/clients
+/conversations
+/deals
+/settings
+/login
+```
+
+Each protected route now follows layered architecture:
+
+```tsx
+<ProtectedRoute>
+  <AppLayout>
+    <Page />
+  </AppLayout>
+</ProtectedRoute>
+```
+
+## Engineering Decisions
+
+### Reusable Layout Pattern
+
+Instead of building navigation separately inside each page, a shared layout system was implemented.
+
+Benefits:
+
+* consistent UI structure
+* scalable frontend architecture
+* simplified page management
+* reduced duplicated layout code
+
+### Configuration-Driven Navigation
+
+Navigation logic was separated from rendering logic.
+
+This improves:
+
+* maintainability
+* scalability
+* future role-based authorization support
+* frontend architecture organization
+
+### Component-Based Layout Design
+
+The dashboard shell was broken into isolated components:
+
+* sidebar
+* header
+* layout wrapper
+
+This follows separation of concerns principles commonly used in scalable frontend systems.
+
+## Task 3 Outcome
+
+Successfully implemented:
+
+* authenticated application shell
+* reusable layout architecture
+* scalable sidebar navigation
+* centralized navigation configuration
+* responsive dashboard structure
+* multi-page protected route system
+* reusable SaaS-style frontend foundation
+
+## Task 3 Screenshots
+
+### Authenticated Dashboard Layout
+
+![Dashboard Layout](./docs/screenshots/dashboard-layout.png)
+
+### Sidebar Navigation System
+
+![Sidebar Navigation](./docs/screenshots/sidebar-navigation.png)
