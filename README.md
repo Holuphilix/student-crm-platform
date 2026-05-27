@@ -923,3 +923,193 @@ Successfully implemented:
 * toast notification system
 * reusable status badge system
 * production-style CRM data flow
+
+## ✅ Task 5 — Deal Pipeline System
+
+### Objective
+
+Implement a scalable CRM deal pipeline system using Kanban-style workflow architecture for visual sales tracking and stage-based client management.
+
+## Deal Pipeline Architecture
+
+Implemented reusable pipeline board architecture using modular frontend component design.
+
+### Pipeline Structure
+
+The CRM pipeline is divided into the following stages:
+
+```txt
+Lead
+Qualified
+Proposal
+Won
+Lost
+```
+
+Each client record is dynamically grouped and rendered according to its current pipeline status.
+
+## Pipeline Component Architecture
+
+Implemented modular reusable pipeline components:
+
+```txt
+src/features/deals/
+└── components
+    ├── deal-card.tsx
+    ├── pipeline-board.tsx
+    └── pipeline-column.tsx
+```
+
+### Component Responsibilities
+
+| Component | Responsibility |
+|---|---|
+| `pipeline-board.tsx` | orchestrates pipeline rendering |
+| `pipeline-column.tsx` | renders grouped stage columns |
+| `deal-card.tsx` | renders reusable CRM deal cards |
+
+## Kanban-Style Workflow System
+
+Implemented dynamic pipeline rendering architecture.
+
+Features include:
+
+* stage-based grouping
+* dynamic deal counters
+* reusable card rendering
+* responsive pipeline columns
+* modular SaaS dashboard structure
+* scalable workflow architecture
+
+## Deal Card System
+
+Each CRM deal card displays:
+
+* client full name
+* email address
+* company information
+* pipeline status badge
+
+The reusable card architecture enables future support for:
+
+* drag-and-drop interactions
+* deal ownership assignment
+* activity tracking
+* realtime updates
+* revenue forecasting
+
+## Pipeline Rendering Logic
+
+Client records are dynamically grouped by:
+
+```ts
+status
+```
+
+Pipeline columns automatically update based on:
+
+* Supabase database records
+* React Query cache updates
+* frontend state synchronization
+
+## CRM Workflow Architecture
+
+### Deal Lifecycle Flow
+
+```mermaid
+graph LR
+
+A[Lead] --> B[Qualified]
+B --> C[Proposal]
+C --> D[Won]
+
+C --> E[Lost]
+```
+
+This architecture mirrors real-world CRM sales workflows used in modern SaaS systems.
+
+## Responsive SaaS Dashboard Layout
+
+The deal pipeline integrates directly into the authenticated application layout system.
+
+Implemented features:
+
+* responsive sidebar layout
+* scalable dashboard spacing
+* reusable dashboard containers
+* responsive pipeline columns
+* consistent SaaS interface styling
+
+## Pipeline Board Screenshot
+
+### Full Deal Pipeline Board
+
+![Deal Pipeline Board](./docs/screenshots/deal-pipeline-board.png)
+
+This screenshot demonstrates:
+
+* dynamic stage rendering
+* distributed deal management
+* Kanban-style workflow visualization
+* reusable CRM deal architecture
+* responsive dashboard integration
+
+## Engineering Decisions
+
+### Modular Pipeline Architecture
+
+The pipeline system was intentionally separated into reusable components to improve:
+
+* maintainability
+* scalability
+* UI consistency
+* future extensibility
+
+This architecture supports future enhancements such as:
+
+* drag-and-drop workflows
+* realtime collaboration
+* deal analytics
+* role-aware permissions
+
+### Configuration-Driven Workflow Rendering
+
+Pipeline stages are rendered dynamically instead of hardcoding UI sections.
+
+Benefits include:
+
+* simplified maintenance
+* easier workflow expansion
+* centralized pipeline configuration
+* scalable frontend logic
+
+## Real Engineering Challenges Encountered
+
+During implementation, a database schema issue was identified involving:
+
+```txt
+missing PRIMARY KEY configuration
+```
+
+This prevented Supabase row updates from functioning correctly.
+
+The issue was resolved by properly configuring the database table with a primary key constraint.
+
+This debugging process reinforced understanding of:
+
+* relational database design
+* primary key architecture
+* Supabase table constraints
+* production database requirements
+
+## Task 5 Engineering Outcome
+
+Successfully implemented:
+
+* CRM pipeline architecture
+* Kanban-style workflow system
+* reusable deal card components
+* dynamic status grouping
+* responsive pipeline board
+* scalable SaaS dashboard workflow
+* production-style frontend structure
