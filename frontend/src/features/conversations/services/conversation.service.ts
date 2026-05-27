@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase/supabase-client";
+import { apiClient } from "@/lib/api/client";
 
 import type {
   ConversationMessage,
@@ -8,32 +8,20 @@ import type {
 export async function getConversationMessages(): Promise<
   ConversationMessage[]
 > {
-  const { data, error } = await supabase
-    .from("conversations")
-    .select("*")
-    .order("created_at", {
-      ascending: true,
-    });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data ?? [];
+  return apiClient<ConversationMessage[]>(
+    "/api/conversations"
+  );
 }
 
 export async function createConversationMessage(
   payload: CreateConversationMessagePayload
 ): Promise<ConversationMessage> {
-  const { data, error } = await supabase
-    .from("conversations")
-    .insert(payload)
-    .select()
-    .single();
+  return apiClient<ConversationMessage>(
+    "/api/conversations",
+    {
+      method: "POST",
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
+      body: JSON.stringify(payload),
+    }
+  );
 }

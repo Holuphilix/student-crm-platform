@@ -41,6 +41,14 @@ app.get("/health", (c) =>
   })
 );
 
+app.get("/", (c) =>
+  successResponse(c, {
+    name: "Student CRM API",
+    status: "running",
+    version: "v1",
+  })
+);
+
 app.use("/api/*", authMiddleware);
 
 app.route("/api/clients", clientsRoute);

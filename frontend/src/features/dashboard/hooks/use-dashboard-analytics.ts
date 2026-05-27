@@ -1,18 +1,13 @@
-import { useMemo } from "react";
-
 import { useQuery } from "@tanstack/react-query";
 
-import {
-  clientStatuses,
-  type Client,
-  type ClientStatus,
-} from "@/features/clients/types/client.types";
-
 import { getDashboardAnalyticsSource } from "@/features/dashboard/services/dashboard.service";
+
 import type {
   DashboardAnalytics,
   PipelineStageAnalytics,
 } from "@/features/dashboard/types/dashboard.types";
+
+import type { ClientStatus } from "@/features/clients/types/client.types";
 
 const dashboardAnalyticsQueryKey = [
   "dashboard-analytics",
@@ -26,71 +21,35 @@ const pipelineStageColors: Record<ClientStatus, string> = {
   lost: "#dc2626",
 };
 
-function formatStatusLabel(status: ClientStatus) {
-  return status
-    .split("_")
-    .map(
-      (word) =>
-        `${word.charAt(0).toUpperCase()}${word.slice(1)}`
-    )
-    .join(" ");
-}
-
-function buildPipelineStages(
-  clients: Client[]
-): PipelineStageAnalytics[] {
-  return clientStatuses.map((status) => ({
-    status,
-    label: formatStatusLabel(status),
-    count: clients.filter(
-      (client) => client.status === status
-    ).length,
-    fill: pipelineStageColors[status],
+function attachPipelineColors(
+  pipelineStages: PipelineStageAnalytics[]
+) {
+  return pipelineStages.map((stage) => ({
+    ...stage,
+    fill: pipelineStageColors[
+      stage.status as ClientStatus
+    ],
   }));
-}
-
-function buildDashboardAnalytics(
-  clients: Client[],
-  totalConversations: number
-): DashboardAnalytics {
-  const pipelineStages = buildPipelineStages(clients);
-
-  const getStageCount = (status: ClientStatus) =>
-    pipelineStages.find((stage) => stage.status === status)
-      ?.count ?? 0;
-
-  return {
-    kpis: {
-      totalClients: clients.length,
-      activeLeads: getStageCount("lead"),
-      wonDeals: getStageCount("won"),
-      lostDeals: getStageCount("lost"),
-      totalConversations,
-    },
-    pipelineStages,
-    recentClients: clients.slice(0, 5),
-  };
 }
 
 export function useDashboardAnalytics() {
   const query = useQuery({
     queryKey: dashboardAnalyticsQueryKey,
-    queryFn: getDashboardAnalyticsSource,
+    queryFn: async (): Promise<DashboardAnalytics> => {
+      const analytics =
+        await getDashboardAnalyticsSource();
+
+      return {
+        ...analytics,
+        pipelineStages: attachPipelineColors(
+          analytics.pipelineStages
+        ),
+      };
+    },
   });
-
-  const analytics = useMemo(() => {
-    if (!query.data) {
-      return null;
-    }
-
-    return buildDashboardAnalytics(
-      query.data.clients,
-      query.data.totalConversations
-    );
-  }, [query.data]);
 
   return {
     ...query,
-    analytics,
+    analytics: query.data ?? null,
   };
 }

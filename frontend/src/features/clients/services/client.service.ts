@@ -1,4 +1,4 @@
-import { supabase } from "@/lib/supabase/supabase-client";
+import { apiClient } from "@/lib/api/client";
 
 import type {
   Client,
@@ -6,32 +6,15 @@ import type {
 } from "@/features/clients/types/client.types";
 
 export async function getClients(): Promise<Client[]> {
-  const { data, error } = await supabase
-    .from("clients")
-    .select("*")
-    .order("created_at", {
-      ascending: false,
-    });
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data ?? [];
+  return apiClient<Client[]>("/api/clients");
 }
 
 export async function createClient(
   payload: CreateClientPayload
 ): Promise<Client> {
-  const { data, error } = await supabase
-    .from("clients")
-    .insert(payload)
-    .select()
-    .single();
+  return apiClient<Client>("/api/clients", {
+    method: "POST",
 
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
+    body: JSON.stringify(payload),
+  });
 }
