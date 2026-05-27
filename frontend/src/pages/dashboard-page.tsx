@@ -1,9 +1,19 @@
+import { AnalyticsDashboard } from "@/features/dashboard/components/analytics-dashboard";
+
 export function DashboardPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center">
-      <h1 className="text-3xl font-bold">
-        Dashboard Page
-      </h1>
+    <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">
+          CRM Analytics
+        </h1>
+
+        <p className="mt-2 text-sm text-muted-foreground">
+          Live client, pipeline, and conversation performance.
+        </p>
+      </div>
+
+      <AnalyticsDashboard />
     </div>
   );
 }
