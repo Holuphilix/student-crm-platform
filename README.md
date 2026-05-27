@@ -642,6 +642,16 @@ The dashboard shell was broken into isolated components:
 
 This follows separation of concerns principles commonly used in scalable frontend systems.
 
+## Task 3 Screenshots
+
+### Authenticated Dashboard Layout
+
+![Dashboard Layout](./docs/screenshots/dashboard-layout.png)
+
+### Sidebar Navigation System
+
+![Sidebar Navigation](./docs/screenshots/sidebar-navigation.png)
+
 ## Task 3 Outcome
 
 Successfully implemented:
@@ -654,12 +664,262 @@ Successfully implemented:
 * multi-page protected route system
 * reusable SaaS-style frontend foundation
 
-## Task 3 Screenshots
+## ✅ Task 4 — Client Management System
 
-### Authenticated Dashboard Layout
+### Objective
 
-![Dashboard Layout](./docs/screenshots/dashboard-layout.png)
+Implement a production-style client management workflow with authenticated CRUD-ready architecture, realtime UI synchronization, Supabase persistence, and scalable frontend data handling.
 
-### Sidebar Navigation System
+## Client Management Architecture
 
-![Sidebar Navigation](./docs/screenshots/sidebar-navigation.png)
+Implemented scalable client management infrastructure using:
+
+* feature-based frontend architecture
+* Supabase database integration
+* React Query server-state management
+* reusable service-layer architecture
+* authenticated data workflows
+* protected business routes
+
+## Client Feature Structure
+
+```txt
+src/features/clients
+├── components
+├── hooks
+│   └── use-clients.ts
+├── services
+│   └── client.service.ts
+└── types
+    └── client.types.ts
+```
+
+### Engineering Purpose
+
+The client module was separated into:
+
+| Layer | Responsibility |
+|---|---|
+| hooks | React Query business logic |
+| services | database communication |
+| types | centralized TypeScript contracts |
+| components | reusable feature UI |
+
+This architecture improves:
+
+* scalability
+* maintainability
+* separation of concerns
+* future feature expansion
+
+## Database Integration
+
+A dedicated `clients` table was created in Supabase PostgreSQL.
+
+### Database Fields
+
+| Column | Purpose |
+|---|---|
+| id | unique identifier |
+| full_name | client name |
+| email | client email |
+| phone | contact number |
+| company | organization |
+| status | pipeline status |
+| created_at | creation timestamp |
+
+## Supabase Row Level Security (RLS)
+
+Production-style database authorization was implemented using Supabase RLS policies.
+
+### Policies Configured
+
+| Policy | Purpose |
+|---|---|
+| SELECT policy | authenticated client retrieval |
+| INSERT policy | authenticated client creation |
+
+### Engineering Importance
+
+RLS ensures:
+
+* protected database access
+* authenticated business operations
+* backend-level authorization
+* secure multi-user scalability
+
+This reflects real SaaS security architecture where database authorization exists independently of frontend validation.
+
+## React Query Integration
+
+React Query was implemented for server-state management.
+
+### Features Implemented
+
+* automatic data fetching
+* mutation handling
+* cache synchronization
+* optimistic UI refresh behavior
+* loading state handling
+
+### Data Flow Architecture
+
+```mermaid
+graph TD
+
+A[Client Form] --> B[React Query Mutation]
+B --> C[Service Layer]
+C --> D[Supabase API]
+D --> E[PostgreSQL Database]
+E --> F[React Query Cache Update]
+F --> G[Realtime UI Refresh]
+```
+
+## Client Creation Workflow
+
+Authenticated users can create new CRM client records directly from the dashboard interface.
+
+### Features Implemented
+
+* client onboarding form
+* authenticated database insertion
+* realtime table synchronization
+* loading state handling
+* success notifications
+* validation handling
+* reusable UI architecture
+
+## Form Validation System
+
+Frontend validation was implemented to improve UX quality and prevent invalid submissions.
+
+### Validation Rules
+
+* required full name
+* required email
+* email input typing
+* disabled loading states
+
+### Validation UX
+
+Invalid submissions immediately trigger frontend feedback before database requests are executed.
+
+## Toast Notification System
+
+Professional toast notifications were implemented using:
+
+```txt
+sonner
+```
+
+### Notification Types
+
+| Notification | Purpose |
+|---|---|
+| success toast | successful client creation |
+| error toast | failed operation handling |
+| validation toast | invalid form feedback |
+
+### Engineering Benefit
+
+This improves:
+
+* UX responsiveness
+* operational clarity
+* user confidence
+* production-level interaction flow
+
+## Status Badge System
+
+Client statuses were upgraded from plain text into reusable badge components.
+
+### Current Status Support
+
+* lead
+
+### Future Expandability
+
+The architecture now supports scalable CRM pipeline stages such as:
+
+* qualified
+* proposal
+* negotiation
+* won
+* lost
+
+## Client Management Interface
+
+The application now supports authenticated client onboarding with realtime synchronization between the frontend and Supabase PostgreSQL.
+
+![Client Management System](./docs/screenshots/client-management-system.png)
+
+## Validation Workflow
+
+Frontend validation prevents incomplete submissions and improves operational usability.
+
+![Client Form Validation](./docs/screenshots/client-form-validation.png)
+
+## Engineering Decisions
+
+### Feature-Based Module Design
+
+The client system was implemented as an isolated feature module instead of placing all logic in page-level files.
+
+Benefits:
+
+* cleaner architecture
+* easier onboarding for contributors
+* scalable business-domain separation
+* improved maintainability
+
+### Service Layer Abstraction
+
+Database logic was separated into dedicated services.
+
+Benefits:
+
+* reusable API logic
+* cleaner React components
+* easier backend replacement
+* testability improvements
+
+### React Query Adoption
+
+React Query was selected over manual fetch/state management because it provides:
+
+* automatic cache handling
+* scalable async workflows
+* simplified loading states
+* improved frontend scalability
+
+## Real Engineering Debugging Encountered
+
+During implementation, Supabase Row Level Security initially blocked authenticated inserts.
+
+This issue was resolved by correctly configuring:
+
+* SELECT policies
+* INSERT policies
+* authenticated role permissions
+
+This debugging process reinforced understanding of:
+
+* database authorization
+* backend security architecture
+* Supabase RLS workflows
+* frontend-to-database request pipelines
+
+## Task 4 Engineering Outcome
+
+Successfully implemented:
+
+* authenticated client onboarding
+* React Query architecture
+* Supabase database persistence
+* secure RLS authorization
+* scalable feature module design
+* realtime UI synchronization
+* validation workflows
+* toast notification system
+* reusable status badge system
+* production-style CRM data flow
