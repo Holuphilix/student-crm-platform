@@ -5,8 +5,20 @@ import {
   BriefcaseBusiness,
   Settings,
 } from "lucide-react";
+import type { ComponentType } from "react";
 
-export const navigationItems = [
+import type { UserRole } from "@/features/auth/types/auth.types";
+
+type NavigationItem = {
+  title: string;
+  href: string;
+  icon: ComponentType<{
+    className?: string;
+  }>;
+  allowedRoles?: UserRole[];
+};
+
+export const navigationItems: NavigationItem[] = [
   {
     title: "Dashboard",
     href: "/",
@@ -31,5 +43,6 @@ export const navigationItems = [
     title: "Settings",
     href: "/settings",
     icon: Settings,
+    allowedRoles: ["admin"],
   },
 ];

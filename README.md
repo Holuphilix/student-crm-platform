@@ -1373,3 +1373,280 @@ Successfully implemented:
 * scalable conversation system
 * production-style security policies
 * modular realtime feature architecture
+
+## ✅ Task 7 — Role-Based Authorization System
+
+### Objective
+
+Implement scalable role-based authorization architecture for the CRM platform using Supabase profiles, protected routes, and permission-aware frontend rendering.
+
+This phase introduces:
+
+* enterprise access control
+* role-aware navigation
+* protected authorization routes
+* dynamic UI rendering based on permissions
+* scalable authorization infrastructure
+
+## Authorization Architecture
+
+Implemented a role-based authorization system layered on top of the existing authentication infrastructure.
+
+Supported roles:
+
+```txt id="rdd71"
+admin
+sales
+manager
+```
+
+## Profiles Database Architecture
+
+Created a dedicated `profiles` table linked to Supabase authenticated users.
+
+### Profiles Table Schema
+
+```sql id="rdd72"
+CREATE TABLE profiles (
+  id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE CASCADE,
+
+  role TEXT NOT NULL DEFAULT 'sales',
+
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc', now())
+);
+```
+
+## Authorization Flow
+
+```mermaid id="6a3tqv"
+graph TD
+
+A[User Login]
+--> B[Supabase Authentication]
+
+B --> C[Fetch User Profile]
+
+C --> D[Load User Role]
+
+D --> E[AuthProvider Stores Role]
+
+E --> F[Role-Based Navigation Rendered]
+
+F --> G[Protected Routes Evaluated]
+```
+
+## Authorization Infrastructure
+
+Implemented:
+
+* role-aware authentication state
+* centralized role management
+* protected role routes
+* permission-based sidebar rendering
+* unauthorized route protection
+* reusable authorization utilities
+
+## Feature Architecture
+
+Implemented reusable authorization infrastructure inside:
+
+```txt id="rdd73"
+src/features/auth
+├── components
+│   ├── protected-route.tsx
+│   └── role-protected-route.tsx
+├── providers
+│   └── auth-provider.tsx
+├── utils
+│   └── role-check.ts
+```
+
+## Role-Based Sidebar Navigation
+
+The application sidebar now dynamically renders based on authenticated user permissions.
+
+### Admin Navigation Access
+
+Admin users can access:
+
+* dashboard
+* clients
+* conversations
+* deals
+* settings
+
+### Sales Navigation Access
+
+Sales users can access:
+
+* dashboard
+* clients
+* conversations
+* deals
+
+Sales users are restricted from accessing:
+
+```txt id="rdd74"
+settings
+```
+
+## Screenshot — Admin Sidebar Access
+
+![Admin Sidebar Access](./docs/screenshots/admin-sidebar-access.png)
+
+## Screenshot — Sales Restricted Sidebar
+
+![Sales Sidebar Restricted](./docs/screenshots/sales-sidebar-restricted.png)
+
+## Route-Level Authorization Protection
+
+Implemented protected authorization wrappers to prevent unauthorized users from manually accessing restricted routes.
+
+Example:
+
+```txt id="rdd75"
+/settings
+```
+
+is protected using role-based route validation.
+
+## Unauthorized Access Flow
+
+```mermaid id="v9k2lp"
+graph TD
+
+A[User Attempts Restricted Route]
+--> B[RoleProtectedRoute Checks Role]
+
+B --> C{Authorized?}
+
+C -->|Yes| D[Allow Access]
+
+C -->|No| E[Render Unauthorized Message]
+```
+
+## Screenshot — Unauthorized Route Protection
+
+![Unauthorized Route Access](./docs/screenshots/unauthorized-route-access.png)
+
+## Row Level Security Policies
+
+Implemented secure profile access using Supabase Row Level Security.
+
+### Profile Policies
+
+```sql id="rdd76"
+CREATE POLICY "Allow authenticated profile reads"
+ON profiles
+FOR SELECT
+TO authenticated
+USING (true);
+
+CREATE POLICY "Allow authenticated profile inserts"
+ON profiles
+FOR INSERT
+TO authenticated
+WITH CHECK (true);
+
+CREATE POLICY "Allow authenticated profile updates"
+ON profiles
+FOR UPDATE
+TO authenticated
+USING (true);
+```
+
+## Engineering Decisions
+
+### Separation of Authentication and Authorization
+
+Authentication and authorization were intentionally separated.
+
+Authentication handles:
+
+```txt id="rdd77"
+Who is the user?
+```
+
+Authorization handles:
+
+```txt id="rdd78"
+What is the user allowed to access?
+```
+
+This separation improves:
+
+* scalability
+* maintainability
+* enterprise readiness
+* cleaner architecture boundaries
+
+## Centralized Role Management
+
+User role information is managed inside:
+
+```txt id="rdd79"
+AuthProvider
+```
+
+Benefits:
+
+* avoids prop drilling
+* enables global permission checks
+* simplifies authorization logic
+* centralizes role state
+
+## Reusable Authorization Utilities
+
+Reusable authorization helpers were isolated inside:
+
+```txt id="rdd710"
+role-check.ts
+```
+
+Benefits:
+
+* cleaner conditional rendering
+* reusable permission logic
+* scalable access control architecture
+* maintainable authorization workflows
+
+## Protected Route Enforcement
+
+Authorization was enforced at:
+
+* sidebar navigation level
+* route level
+* component rendering level
+
+This prevents unauthorized users from bypassing UI restrictions by manually typing protected URLs.
+
+## Real Engineering Challenges Encountered
+
+During implementation, several enterprise authorization concerns were encountered involving:
+
+* user role synchronization
+* protected route validation
+* dynamic sidebar rendering
+* Supabase profile integration
+* authorization state management
+
+This debugging process reinforced understanding of:
+
+* enterprise access control
+* permission-aware frontend architecture
+* protected route systems
+* authorization middleware patterns
+* role-based UI rendering
+
+## Task 7 Engineering Outcome
+
+Successfully implemented:
+
+* scalable authorization architecture
+* role-based access control
+* protected authorization routes
+* permission-aware navigation
+* centralized role management
+* enterprise-style access workflows
+* dynamic sidebar rendering
+* unauthorized access protection

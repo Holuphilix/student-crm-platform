@@ -10,9 +10,18 @@ import {
   SidebarMenuItem,
 } from "@/components/ui/sidebar";
 
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { filterByRole } from "@/features/auth/utils/role-check";
 import { navigationItems } from "@/lib/navigation/navigation.config";
 
 export function AppSidebar() {
+  const { role } = useAuth();
+
+  const authorizedNavigationItems = filterByRole(
+    navigationItems,
+    role
+  );
+
   return (
     <Sidebar>
       <SidebarContent>
@@ -25,7 +34,7 @@ export function AppSidebar() {
             </div>
 
             <SidebarMenu>
-              {navigationItems.map((item) => {
+              {authorizedNavigationItems.map((item) => {
                 const Icon = item.icon;
 
                 return (

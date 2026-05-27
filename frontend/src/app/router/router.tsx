@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/components/layout/app-layout";
 
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
+import { RoleProtectedRoute } from "@/features/auth/components/role-protected-route";
 
 import { ClientsPage } from "@/pages/clients-page";
 import { ConversationsPage } from "@/pages/conversations-page";
@@ -66,7 +67,9 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <AppLayout>
-          <SettingsPage />
+          <RoleProtectedRoute allowedRoles={["admin"]}>
+            <SettingsPage />
+          </RoleProtectedRoute>
         </AppLayout>
       </ProtectedRoute>
     ),
