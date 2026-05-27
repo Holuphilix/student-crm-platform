@@ -1,0 +1,8 @@
+name = "student-crm-api"
+main = "src/index.ts"
+compatibility_date = "2026-05-27"
+
+[vars]
+# Configure these in Cloudflare dashboard or with `wrangler secret put`.
+# SUPABASE_URL = ""
+# SUPABASE_SERVICE_ROLE_KEY = ""
