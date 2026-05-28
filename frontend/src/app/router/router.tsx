@@ -3,6 +3,7 @@ import { createBrowserRouter } from "react-router-dom";
 import { AppLayout } from "@/components/layout/app-layout";
 
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
+import { PublicOnlyRoute } from "@/features/auth/components/public-only-route";
 import { RoleProtectedRoute } from "@/features/auth/components/role-protected-route";
 
 import { ClientDetailPage } from "@/pages/client-detail-page";
@@ -12,12 +13,26 @@ import { DashboardPage } from "@/pages/dashboard-page";
 import { DealDetailPage } from "@/pages/deal-detail-page";
 import { DealsPage } from "@/pages/deals-page";
 import { LoginPage } from "@/pages/login-page";
+import { RegisterPage } from "@/pages/register-page";
 import { SettingsPage } from "@/pages/settings-page";
 
 export const router = createBrowserRouter([
   {
     path: "/login",
-    element: <LoginPage />,
+    element: (
+      <PublicOnlyRoute>
+        <LoginPage />
+      </PublicOnlyRoute>
+    ),
+  },
+
+  {
+    path: "/register",
+    element: (
+      <PublicOnlyRoute>
+        <RegisterPage />
+      </PublicOnlyRoute>
+    ),
   },
 
   {

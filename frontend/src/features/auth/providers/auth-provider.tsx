@@ -8,8 +8,15 @@ import type { ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
 
 import { supabase } from "@/lib/supabase/supabase-client";
+import {
+  signInWithEmail,
+  signOutUser,
+  signUpWithEmail,
+} from "@/features/auth/services/auth.service";
 import type {
   AuthContextType,
+  SignInPayload,
+  SignUpPayload,
   UserProfile,
 } from "@/features/auth/types/auth.types";
 
@@ -46,6 +53,18 @@ export function AuthProvider({ children }: AuthProviderProps) {
     useState<UserProfile | null>(null);
 
   const [loading, setLoading] = useState(true);
+
+  async function signIn(payload: SignInPayload) {
+    await signInWithEmail(payload);
+  }
+
+  async function signUp(payload: SignUpPayload) {
+    await signUpWithEmail(payload);
+  }
+
+  async function signOut() {
+    await signOutUser();
+  }
 
   useEffect(() => {
     let isMounted = true;
@@ -121,6 +140,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
         profile,
         role: profile?.role ?? null,
         loading,
+        signIn,
+        signUp,
+        signOut,
       }}
     >
       {children}

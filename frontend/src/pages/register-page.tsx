@@ -1,56 +1,59 @@
 import { useState } from "react";
-import {
-  Link,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { useAuth } from "@/features/auth/hooks/use-auth";
 
-export function LoginPage() {
+export function RegisterPage() {
   const navigate = useNavigate();
-  const location = useLocation();
-  const { signIn } = useAuth();
+  const { signUp } = useAuth();
 
+  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const [confirmPassword, setConfirmPassword] =
+    useState("");
   const [loading, setLoading] = useState(false);
-
   const [error, setError] = useState("");
 
-  async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
+  async function handleRegister(
+    event: React.FormEvent<HTMLFormElement>
+  ) {
     event.preventDefault();
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
 
     setLoading(true);
     setError("");
 
     try {
-      await signIn({
+      await signUp({
+        fullName,
         email,
         password,
       });
 
-      const redirectTo =
-        (
-          location.state as
-            | { from?: { pathname?: string } }
-            | null
-        )?.from?.pathname ?? "/";
-
-      navigate(redirectTo, {
-        replace: true,
-      });
-    } catch (loginError) {
+      toast.success("Account created successfully.");
+      navigate("/");
+    } catch (registerError) {
       setError(
-        loginError instanceof Error
-          ? loginError.message
-          : "Failed to sign in."
+        registerError instanceof Error
+          ? registerError.message
+          : "Failed to create account."
       );
     } finally {
       setLoading(false);
@@ -62,15 +65,31 @@ export function LoginPage() {
       <Card className="w-full max-w-md rounded-lg">
         <CardHeader>
           <CardTitle className="text-2xl">
-            Student CRM Login
+            Create CRM Account
           </CardTitle>
         </CardHeader>
 
         <CardContent>
           <form
-            onSubmit={handleLogin}
+            onSubmit={handleRegister}
             className="space-y-4"
           >
+            <div className="space-y-2">
+              <Label htmlFor="full-name">
+                Full Name
+              </Label>
+
+              <Input
+                id="full-name"
+                placeholder="Kenny James"
+                value={fullName}
+                onChange={(event) =>
+                  setFullName(event.target.value)
+                }
+                required
+              />
+            </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">
                 Email
@@ -96,12 +115,31 @@ export function LoginPage() {
               <Input
                 id="password"
                 type="password"
-                placeholder="Enter password"
+                placeholder="Create password"
                 value={password}
                 onChange={(event) =>
                   setPassword(event.target.value)
                 }
                 required
+                minLength={6}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="confirm-password">
+                Confirm Password
+              </Label>
+
+              <Input
+                id="confirm-password"
+                type="password"
+                placeholder="Confirm password"
+                value={confirmPassword}
+                onChange={(event) =>
+                  setConfirmPassword(event.target.value)
+                }
+                required
+                minLength={6}
               />
             </div>
 
@@ -116,17 +154,19 @@ export function LoginPage() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading
+                ? "Creating account..."
+                : "Create Account"}
             </Button>
           </form>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Need an account?{" "}
+            Already have an account?{" "}
             <Link
-              to="/register"
+              to="/login"
               className="font-medium text-foreground underline-offset-4 hover:underline"
             >
-              Create one
+              Sign in
             </Link>
           </p>
         </CardContent>
