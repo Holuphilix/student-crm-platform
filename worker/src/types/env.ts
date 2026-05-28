@@ -1,4 +1,4 @@
-import type { SupabaseClient, User } from "@supabase/supabase-js";
+import type { SupabaseClient } from "@supabase/supabase-js";
 
 export type Env = {
   SUPABASE_URL: string;
@@ -6,9 +6,14 @@ export type Env = {
   CORS_ORIGIN?: string;
 };
 
+export type AuthenticatedUser = {
+  id: string;
+  email?: string;
+};
+
 export type AppVariables = {
   supabase: SupabaseClient;
-  user: User;
+  user: AuthenticatedUser;
   requestId: string;
 };
 

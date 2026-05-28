@@ -18,3 +18,26 @@ export const createConversationMessageSchema = z.object({
   message: z.string().trim().min(1).max(5000),
   sender: z.enum(conversationSenders),
 });
+
+export const dealIdParamSchema = z.object({
+  dealId: z.uuid(),
+});
+
+export const createDealSchema = z.object({
+  client_id: z.uuid(),
+  owner_id: z.uuid().optional(),
+  title: z.string().trim().min(1).max(200),
+  value_amount: z.number().nonnegative().optional(),
+  expected_intake: z.string().trim().max(120).optional(),
+});
+
+export const updateDealStageSchema = z.object({
+  stage: z.enum(clientStatuses),
+  lost_reason: z.string().trim().max(500).optional(),
+});
+
+export const createDealNoteSchema = z.object({
+  deal_id: z.uuid(),
+  author_id: z.uuid().optional(),
+  body: z.string().trim().min(1).max(5000),
+});

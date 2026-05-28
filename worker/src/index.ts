@@ -1,13 +1,20 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 
-import { errorResponse, successResponse } from "./lib/api-response";
+import {
+  errorResponse,
+  successResponse,
+} from "./lib/api-response";
+
 import { authMiddleware } from "./middleware/auth";
 import { errorHandlingMiddleware } from "./middleware/error-handling";
 import { requestLoggingMiddleware } from "./middleware/request-logging";
+
 import { clientsRoute } from "./routes/clients";
 import { conversationsRoute } from "./routes/conversations";
 import { dashboardRoute } from "./routes/dashboard";
+import { dealsRoute } from "./routes/deals";
+
 import type { AppBindings } from "./types/env";
 
 const app = new Hono<AppBindings>();
@@ -17,18 +24,24 @@ app.use("*", requestLoggingMiddleware);
 app.use(
   "*",
   cors({
-    origin: (origin, c) => c.env.CORS_ORIGIN ?? origin,
+    origin: (origin, c) =>
+      c.env.CORS_ORIGIN ?? origin,
+
     allowHeaders: [
       "Authorization",
       "Content-Type",
       "X-Requested-With",
     ],
+
     allowMethods: [
       "GET",
       "POST",
+      "PATCH",
       "OPTIONS",
     ],
+
     credentials: true,
+
     maxAge: 86400,
   })
 );
@@ -52,8 +65,18 @@ app.get("/", (c) =>
 app.use("/api/*", authMiddleware);
 
 app.route("/api/clients", clientsRoute);
-app.route("/api/conversations", conversationsRoute);
-app.route("/api/dashboard", dashboardRoute);
+
+app.route(
+  "/api/conversations",
+  conversationsRoute
+);
+
+app.route(
+  "/api/dashboard",
+  dashboardRoute
+);
+
+app.route("/api/deals", dealsRoute);
 
 app.notFound((c) =>
   errorResponse(
@@ -65,3 +88,4 @@ app.notFound((c) =>
 );
 
 export default app;
+
