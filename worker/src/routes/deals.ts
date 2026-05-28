@@ -7,6 +7,7 @@ import {
 } from "../lib/api-response";
 import {
   createDealNoteSchema,
+  createScopedDealNoteSchema,
   createDealSchema,
   dealIdParamSchema,
   updateDealStageSchema,
@@ -14,6 +15,7 @@ import {
 import {
   addDealNote,
   createDeal,
+  getDealDetail,
   getDeals,
   updateDealStage,
 } from "../services/deal.service";
@@ -47,6 +49,73 @@ export const dealsRoute = new Hono<AppBindings>()
       );
 
       return successResponse(c, deal, 201);
+    }
+  )
+  .get(
+    "/:dealId",
+    zValidator("param", dealIdParamSchema, (result, c) => {
+      if (!result.success) {
+        return errorResponse(
+          c,
+          "VALIDATION_ERROR",
+          "Deal id is invalid.",
+          400,
+          result.error.issues
+        );
+      }
+    }),
+    async (c) => {
+      const { dealId } = c.req.valid("param");
+      const deal = await getDealDetail(
+        c.get("supabase"),
+        dealId
+      );
+
+      return successResponse(c, deal);
+    }
+  )
+  .post(
+    "/:dealId/notes",
+    zValidator("param", dealIdParamSchema, (result, c) => {
+      if (!result.success) {
+        return errorResponse(
+          c,
+          "VALIDATION_ERROR",
+          "Deal id is invalid.",
+          400,
+          result.error.issues
+        );
+      }
+    }),
+    zValidator(
+      "json",
+      createScopedDealNoteSchema,
+      (result, c) => {
+        if (!result.success) {
+          return errorResponse(
+            c,
+            "VALIDATION_ERROR",
+            "Deal note payload is invalid.",
+            400,
+            result.error.issues
+          );
+        }
+      }
+    ),
+    async (c) => {
+      const { dealId } = c.req.valid("param");
+      const payload = c.req.valid("json");
+      const note = await addDealNote(
+        c.get("supabase"),
+        {
+          deal_id: dealId,
+          author_id:
+            payload.author_id ?? c.get("user").id,
+          body: payload.body,
+        }
+      );
+
+      return successResponse(c, note, 201);
     }
   )
   .patch(

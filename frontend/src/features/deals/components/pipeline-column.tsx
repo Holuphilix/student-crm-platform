@@ -8,22 +8,22 @@ import {
 } from "@/components/ui/card";
 
 import type {
-  Client,
   ClientStatus,
 } from "@/features/clients/types/client.types";
 
 import { DealCard } from "@/features/deals/components/deal-card";
+import type { DealWithClient } from "@/features/deals/types/deal.types";
 
 type PipelineColumnProps = {
   title: string;
   status: ClientStatus;
-  clients: Client[];
+  deals: DealWithClient[];
 };
 
 export function PipelineColumn({
   title,
   status,
-  clients,
+  deals,
 }: PipelineColumnProps) {
   return (
     <Card className="min-h-80 rounded-lg bg-muted/40 shadow-none">
@@ -34,17 +34,17 @@ export function PipelineColumn({
           </CardTitle>
 
           <Badge variant="secondary">
-            {clients.length}
+            {deals.length}
           </Badge>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-3">
-        {clients.length > 0 ? (
-          clients.map((client) => (
+        {deals.length > 0 ? (
+          deals.map((deal) => (
             <DealCard
-              key={client.id}
-              client={client}
+              key={deal.id}
+              deal={deal}
             />
           ))
         ) : (

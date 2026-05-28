@@ -37,11 +37,22 @@ export const authMiddleware: MiddlewareHandler<
   const supabase =
     createSupabaseAdminClient(c.env);
 
-  c.set("supabase", supabase);
+  const { data, error } =
+    await supabase.auth.getUser(token);
 
+  if (error || !data.user) {
+    return errorResponse(
+      c,
+      "UNAUTHORIZED",
+      "Invalid or expired bearer token.",
+      401
+    );
+  }
+
+  c.set("supabase", supabase);
   c.set("user", {
-    id: "development-user",
-    email: "dev@studentcrm.com",
+    id: data.user.id,
+    email: data.user.email,
   });
 
   await next();

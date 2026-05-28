@@ -5,6 +5,8 @@ import type {
   CreateDealNotePayload,
   CreateDealPayload,
   Deal,
+  DealActivityItem,
+  DealDetail,
   DealNote,
   DealStage,
   DealStageHistory,
@@ -40,6 +42,146 @@ export async function getDeals(
   }
 
   return (data ?? []) as DealWithClient[];
+}
+
+function buildDealActivityFeed(payload: {
+  deal: Deal;
+  notes: DealNote[];
+  stageHistory: DealStageHistory[];
+}): DealActivityItem[] {
+  const { deal, notes, stageHistory } = payload;
+
+  const activityFeed: DealActivityItem[] = [
+    {
+      id: `deal-created-${deal.id}`,
+      type: "deal_created",
+      title: "Deal created",
+      description: deal.title,
+      created_at: deal.created_at,
+      metadata: {
+        deal_id: deal.id,
+        stage: deal.stage,
+      },
+    },
+    ...notes.map((note) => ({
+      id: `deal-note-${note.id}`,
+      type: "note_created" as const,
+      title: "Note added",
+      description: note.body,
+      created_at: note.created_at,
+      metadata: {
+        note_id: note.id,
+        author_id: note.author_id,
+      },
+    })),
+    ...stageHistory.map((history) => ({
+      id: `deal-stage-${history.id}`,
+      type: "stage_changed" as const,
+      title: "Stage changed",
+      description: `Moved from ${history.from_stage ?? "none"} to ${history.to_stage}.`,
+      created_at: history.created_at,
+      metadata: {
+        from_stage: history.from_stage,
+        to_stage: history.to_stage,
+        changed_by: history.changed_by,
+      },
+    })),
+  ];
+
+  return activityFeed.sort(
+    (firstActivity, secondActivity) =>
+      new Date(secondActivity.created_at).getTime() -
+      new Date(firstActivity.created_at).getTime()
+  );
+}
+
+export async function getDealDetail(
+  supabase: SupabaseClient,
+  dealId: string
+): Promise<DealDetail> {
+  const { data: deal, error: dealError } =
+    await supabase
+      .from("deals")
+      .select(
+        `
+        *,
+        clients (
+          full_name,
+          email,
+          company
+        )
+      `
+      )
+      .eq("id", dealId)
+      .maybeSingle();
+
+  if (dealError) {
+    throw new HttpError(
+      502,
+      "DEAL_DETAIL_FETCH_FAILED",
+      dealError.message
+    );
+  }
+
+  if (!deal) {
+    throw new HttpError(
+      404,
+      "DEAL_NOT_FOUND",
+      "Deal not found."
+    );
+  }
+
+  const [notesResponse, historyResponse] =
+    await Promise.all([
+      supabase
+        .from("deal_notes")
+        .select("*")
+        .eq("deal_id", dealId)
+        .order("created_at", {
+          ascending: false,
+        }),
+
+      supabase
+        .from("deal_stage_history")
+        .select("*")
+        .eq("deal_id", dealId)
+        .order("created_at", {
+          ascending: false,
+        }),
+    ]);
+
+  if (notesResponse.error) {
+    throw new HttpError(
+      502,
+      "DEAL_NOTES_FETCH_FAILED",
+      notesResponse.error.message
+    );
+  }
+
+  if (historyResponse.error) {
+    throw new HttpError(
+      502,
+      "DEAL_STAGE_HISTORY_FETCH_FAILED",
+      historyResponse.error.message
+    );
+  }
+
+  const notes =
+    (notesResponse.data ?? []) as DealNote[];
+  const stageHistory =
+    (historyResponse.data ??
+      []) as DealStageHistory[];
+
+  return {
+    deal: deal as DealWithClient,
+    notes,
+    stageHistory,
+    activityFeed: buildDealActivityFeed({
+      deal: deal as Deal,
+      notes,
+      stageHistory,
+    }),
+  };
 }
 
 async function recordDealStageHistory(

@@ -9,6 +9,7 @@ import { ClientDetailPage } from "@/pages/client-detail-page";
 import { ClientsPage } from "@/pages/clients-page";
 import { ConversationsPage } from "@/pages/conversations-page";
 import { DashboardPage } from "@/pages/dashboard-page";
+import { DealDetailPage } from "@/pages/deal-detail-page";
 import { DealsPage } from "@/pages/deals-page";
 import { LoginPage } from "@/pages/login-page";
 import { SettingsPage } from "@/pages/settings-page";
@@ -69,6 +70,17 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <AppLayout>
           <DealsPage />
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/deals/:dealId",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <DealDetailPage />
         </AppLayout>
       </ProtectedRoute>
     ),

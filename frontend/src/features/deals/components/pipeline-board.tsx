@@ -2,13 +2,12 @@ import { useMemo } from "react";
 
 import {
   clientStatuses,
-  type Client,
   type ClientStatus,
 } from "@/features/clients/types/client.types";
 
-import { useClients } from "@/features/clients/hooks/use-clients";
-
 import { PipelineColumn } from "@/features/deals/components/pipeline-column";
+import { useDeals } from "@/features/deals/hooks/use-deals";
+import type { DealWithClient } from "@/features/deals/types/deal.types";
 
 type PipelineStatusConfig = {
   status: ClientStatus;
@@ -27,12 +26,12 @@ const pipelineStatuses: PipelineStatusConfig[] =
       .join(" "),
   }));
 
-function groupClientsByStatus(clients: Client[]) {
-  return clients.reduce<
-    Record<ClientStatus, Client[]>
+function groupDealsByStage(deals: DealWithClient[]) {
+  return deals.reduce<
+    Record<ClientStatus, DealWithClient[]>
   >(
-    (groups, client) => {
-      groups[client.status].push(client);
+    (groups, deal) => {
+      groups[deal.stage].push(deal);
 
       return groups;
     },
@@ -48,14 +47,14 @@ function groupClientsByStatus(clients: Client[]) {
 
 export function PipelineBoard() {
   const {
-    data: clients = [],
+    data: deals = [],
     isLoading,
     isError,
-  } = useClients();
+  } = useDeals();
 
-  const clientsByStatus = useMemo(
-    () => groupClientsByStatus(clients),
-    [clients]
+  const dealsByStage = useMemo(
+    () => groupDealsByStage(deals),
+    [deals]
   );
 
   if (isLoading) {
@@ -81,7 +80,7 @@ export function PipelineBoard() {
           key={status}
           title={title}
           status={status}
-          clients={clientsByStatus[status]}
+          deals={dealsByStage[status]}
         />
       ))}
     </div>

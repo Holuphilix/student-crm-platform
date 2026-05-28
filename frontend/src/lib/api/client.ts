@@ -1,6 +1,5 @@
 import { supabase } from "@/lib/supabase/supabase-client";
-
-const API_BASE_URL = import.meta.env.VITE_API_URL;
+import { API_BASE_URL } from "@/lib/api/api-config";
 
 async function getAccessToken() {
   const {

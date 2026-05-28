@@ -3820,3 +3820,297 @@ Successfully implemented:
 * unified client relationship experience
 * scalable CRM relationship workflows
 * enterprise-style relationship-driven CRM architecture
+
+## ✅ Task 13 — Deal Pipeline and Relationship Lifecycle Management
+
+### Objective
+
+Build a complete CRM deal management workflow capable of handling:
+
+* deal creation
+* pipeline tracking
+* deal stage lifecycle management
+* activity tracking
+* deal notes
+* relationship persistence
+
+This phase transformed the Student CRM Platform from a client management system into a true sales and enrollment workflow platform.
+
+The system now supports real relationship-driven CRM operations using persisted relational data.
+
+## Deal Management System Overview
+
+Implemented a full CRM pipeline system responsible for:
+
+* creating enrollment deals
+* associating deals with CRM clients
+* tracking deal progression
+* recording relationship activity
+* storing deal notes
+* visualizing pipeline stages
+* maintaining deal history
+
+The system now models a real CRM sales lifecycle.
+
+## Deal Lifecycle Architecture
+
+```mermaid
+graph TD
+
+A[Client]
+--> B[Deal]
+
+B --> C[Pipeline Stage]
+
+B --> D[Deal Notes]
+
+B --> E[Activity Feed]
+
+E --> F[Stage History]
+
+E --> G[Relationship Events]
+```
+
+This introduced:
+
+* relationship persistence
+* deal lifecycle tracking
+* CRM workflow management
+* relational activity history
+
+## Deal Feature Structure
+
+```txt id="td131"
+src/features/deals
+├── components
+│   ├── activity-feed.tsx
+│   ├── deal-card.tsx
+│   ├── deal-notes-card.tsx
+│   ├── note-input.tsx
+│   ├── pipeline-board.tsx
+│   └── pipeline-column.tsx
+├── hooks
+│   └── use-deal-notes.ts
+├── services
+│   └── deal-notes.service.ts
+└── types
+    └── deal.types.ts
+```
+
+## Deal Pipeline System
+
+Implemented a dynamic pipeline board responsible for visualizing CRM deal stages.
+
+### Pipeline Stages
+
+| Stage     | Purpose                       |
+| --------- | ----------------------------- |
+| Lead      | newly created opportunities   |
+| Qualified | validated prospects           |
+| Proposal  | active enrollment discussions |
+| Won       | successful enrollments        |
+| Lost      | unsuccessful opportunities    |
+
+The pipeline dynamically renders persisted backend data.
+
+## Deal Creation Workflow
+
+Implemented a deal creation system capable of:
+
+* linking deals to clients
+* assigning pipeline stages
+* storing monetary value
+* tracking expected intake periods
+* persisting relationship records
+
+### Deal Creation Fields
+
+| Field           | Purpose                    |
+| --------------- | -------------------------- |
+| Client          | relational client linkage  |
+| Deal Title      | opportunity name           |
+| Deal Value      | projected enrollment value |
+| Expected Intake | intake tracking            |
+
+This introduced:
+
+* real CRM opportunity tracking
+* relational deal ownership
+* enrollment pipeline management
+
+## Deal Workspace System
+
+Implemented a dedicated deal workspace page responsible for:
+
+* viewing deal information
+* managing notes
+* tracking lifecycle activity
+* reviewing stage history
+* visualizing relationship progress
+
+### Deal Workspace Features
+
+| Feature        | Responsibility                 |
+| -------------- | ------------------------------ |
+| Deal Summary   | enrollment opportunity details |
+| Notes Section  | CRM collaboration notes        |
+| Activity Feed  | relationship event tracking    |
+| Stage Tracking | pipeline lifecycle visibility  |
+
+## Deal Notes Architecture
+
+Implemented relational deal notes persistence using:
+
+```txt id="td132"
+deal_notes
+```
+
+This system allows CRM users to:
+
+* record client discussions
+* store enrollment updates
+* preserve relationship history
+* track communication progress
+
+### Example CRM Note
+
+```txt id="td133"
+Student requested September intake information.
+```
+
+This introduced:
+
+* collaborative CRM workflows
+* relationship memory persistence
+* historical communication tracking
+
+## Activity Feed System
+
+Implemented an automated activity feed responsible for tracking CRM lifecycle events.
+
+### Activity Events
+
+| Event Type    | Purpose                     |
+| ------------- | --------------------------- |
+| Deal Created  | relationship initialization |
+| Stage Changed | pipeline lifecycle tracking |
+| Note Added    | CRM collaboration logging   |
+
+The activity system now acts as a lightweight CRM audit trail.
+
+## Database Relationship Architecture
+
+Implemented persisted relational storage using:
+
+| Table              | Responsibility                |
+| ------------------ | ----------------------------- |
+| deals              | CRM enrollment opportunities  |
+| deal_notes         | relationship note persistence |
+| deal_stage_history | lifecycle activity tracking   |
+
+This introduced:
+
+* normalized relational architecture
+* relationship-driven persistence
+* CRM lifecycle history
+* audit-style activity tracking
+
+## Real Persistence Verification
+
+Verified:
+
+* deals persist after refresh
+* notes persist after refresh
+* activity history persists
+* relational links remain intact
+* pipeline stages dynamically update
+
+This confirmed the system is using:
+
+```txt id="td134"
+real backend persistence
+```
+
+instead of hardcoded frontend state.
+
+## Screenshot — Deal Pipeline Board
+
+![Deal Pipeline Board](./docs/screenshots/deals-pipeline-board.png)
+
+## Screenshot — Deal Workspace Detail
+
+![Deal Workspace Detail](./docs/screenshots/deal-workspace-detail.png)
+
+## CRM Engineering Concepts Learned
+
+Task 13 introduced several important CRM engineering concepts:
+
+### Pipeline State Management
+
+Understanding how CRM opportunities move across lifecycle stages.
+
+### Relationship Persistence
+
+Building normalized relational workflows between:
+
+```txt id="td135"
+clients
+↓
+deals
+↓
+notes
+↓
+activity history
+```
+
+### Activity Tracking Systems
+
+Implementing audit-style CRM activity feeds.
+
+### Relational Data Modeling
+
+Understanding how CRM entities connect through foreign-key relationships.
+
+### Workspace-Based CRM Design
+
+Building dedicated workflow pages for relationship management.
+
+## Real Engineering Challenges Encountered
+
+During implementation, several engineering concerns were handled:
+
+* relational database modeling
+* persisted pipeline state
+* backend workflow integration
+* activity synchronization
+* deal-to-client linkage
+* note persistence
+* lifecycle tracking
+* empty state handling
+* real-time UI hydration
+* backend relationship validation
+
+This improved understanding of:
+
+* enterprise CRM architecture
+* relationship-driven systems
+* full-stack persistence workflows
+* SaaS pipeline engineering
+* lifecycle state management
+
+## Task 13 Engineering Outcome
+
+Successfully implemented:
+
+* dynamic CRM deal pipeline
+* relational deal persistence
+* deal workspace architecture
+* activity feed system
+* deal notes persistence
+* lifecycle stage tracking
+* relationship history management
+* normalized CRM database structure
+* persisted enrollment workflows
+* relational backend integration
+* audit-style activity tracking
+* enterprise CRM relationship architecture

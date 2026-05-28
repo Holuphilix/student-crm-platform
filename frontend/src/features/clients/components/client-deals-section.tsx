@@ -1,4 +1,7 @@
+import { Link } from "react-router-dom";
+
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -92,6 +95,18 @@ export function ClientDealsSection({
                     {deal.lost_reason}
                   </p>
                 ) : null}
+
+                <div className="mt-3">
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                  >
+                    <Link to={`/deals/${deal.id}`}>
+                      Open workspace
+                    </Link>
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
