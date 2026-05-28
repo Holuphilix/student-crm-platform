@@ -1,2 +1,2 @@
 export const API_BASE_URL =
-  "https://student-crm-api.student-crm-platform.workers.dev";
+  import.meta.env.VITE_API_URL || "http://localhost:8787";

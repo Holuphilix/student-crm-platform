@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Badge } from "@/components/ui/badge";
@@ -81,6 +82,16 @@ export function ClientsPage() {
 
   return (
     <div className="space-y-6">
+      <div>
+        <h1 className="text-3xl font-bold">
+          Clients
+        </h1>
+
+        <p className="mt-2 text-sm text-muted-foreground">
+          Manage and organize CRM client relationships.
+        </p>
+      </div>
+
       <Card>
         <CardHeader>
           <CardTitle>
@@ -175,6 +186,10 @@ export function ClientsPage() {
                   <TableHead>
                     Status
                   </TableHead>
+
+                  <TableHead>
+                    Details
+                  </TableHead>
                 </TableRow>
               </TableHeader>
 
@@ -201,6 +216,20 @@ export function ClientsPage() {
                       <Badge>
                         {client.status}
                       </Badge>
+                    </TableCell>
+
+                    <TableCell>
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                      >
+                        <Link
+                          to={`/clients/${client.id}`}
+                        >
+                          View
+                        </Link>
+                      </Button>
                     </TableCell>
                   </TableRow>
                 ))}

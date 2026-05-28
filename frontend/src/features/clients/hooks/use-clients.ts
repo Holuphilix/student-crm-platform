@@ -6,6 +6,7 @@ import {
 
 import {
   createClient,
+  getClientDetail,
   getClients,
 } from "@/features/clients/services/client.service";
 
@@ -17,6 +18,14 @@ export function useClients() {
   return useQuery({
     queryKey: ["clients"],
     queryFn: getClients,
+  });
+}
+
+export function useClientDetail(clientId?: string) {
+  return useQuery({
+    queryKey: ["clients", clientId],
+    queryFn: () => getClientDetail(clientId!),
+    enabled: Boolean(clientId),
   });
 }
 

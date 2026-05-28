@@ -125,3 +125,27 @@ export type DealStageHistory = {
   changed_by: string | null;
   created_at: string;
 };
+
+export type ClientActivityType =
+  | "client_created"
+  | "conversation_message"
+  | "deal_created"
+  | "deal_note"
+  | "deal_stage_changed";
+
+export type ClientActivityItem = {
+  id: string;
+  type: ClientActivityType;
+  title: string;
+  description: string;
+  created_at: string;
+  metadata?: Record<string, unknown>;
+};
+
+export type ClientDetail = {
+  client: Client;
+  conversations: ConversationMessage[];
+  deals: Deal[];
+  notes: DealNote[];
+  stageHistory: DealStageHistory[];
+};

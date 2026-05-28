@@ -1,7 +1,6 @@
 import { supabase } from "@/lib/supabase/supabase-client";
 
-const API_BASE_URL =
-  "https://student-crm-api.student-crm-platform.workers.dev";
+const API_BASE_URL = import.meta.env.VITE_API_URL;
 
 async function getAccessToken() {
   const {

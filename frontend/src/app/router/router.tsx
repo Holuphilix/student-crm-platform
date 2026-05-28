@@ -5,6 +5,7 @@ import { AppLayout } from "@/components/layout/app-layout";
 import { ProtectedRoute } from "@/features/auth/components/protected-route";
 import { RoleProtectedRoute } from "@/features/auth/components/role-protected-route";
 
+import { ClientDetailPage } from "@/pages/client-detail-page";
 import { ClientsPage } from "@/pages/clients-page";
 import { ConversationsPage } from "@/pages/conversations-page";
 import { DashboardPage } from "@/pages/dashboard-page";
@@ -35,6 +36,17 @@ export const router = createBrowserRouter([
       <ProtectedRoute>
         <AppLayout>
           <ClientsPage />
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/clients/:clientId",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <ClientDetailPage />
         </AppLayout>
       </ProtectedRoute>
     ),

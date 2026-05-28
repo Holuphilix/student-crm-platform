@@ -19,6 +19,10 @@ export const createConversationMessageSchema = z.object({
   sender: z.enum(conversationSenders),
 });
 
+export const clientIdParamSchema = z.object({
+  clientId: z.uuid(),
+});
+
 export const dealIdParamSchema = z.object({
   dealId: z.uuid(),
 });

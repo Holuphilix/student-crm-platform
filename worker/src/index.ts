@@ -19,13 +19,39 @@ import type { AppBindings } from "./types/env";
 
 const app = new Hono<AppBindings>();
 
+const localFrontendOrigins = new Set([
+  "http://localhost:5173",
+  "http://127.0.0.1:5173",
+]);
+
+function getAllowedOrigins(corsOrigin?: string) {
+  return new Set([
+    ...localFrontendOrigins,
+    ...(corsOrigin
+      ?.split(",")
+      .map((origin) => origin.trim())
+      .filter(Boolean) ?? []),
+  ]);
+}
+
 app.use("*", requestLoggingMiddleware);
 
 app.use(
   "*",
   cors({
-    origin: (origin, c) =>
-      c.env.CORS_ORIGIN ?? origin,
+    origin: (origin, c) => {
+      if (!origin) {
+        return null;
+      }
+
+      const allowedOrigins = getAllowedOrigins(
+        c.env.CORS_ORIGIN
+      );
+
+      return allowedOrigins.has(origin)
+        ? origin
+        : null;
+    },
 
     allowHeaders: [
       "Authorization",
@@ -37,6 +63,7 @@ app.use(
       "GET",
       "POST",
       "PATCH",
+      "DELETE",
       "OPTIONS",
     ],
 
@@ -88,4 +115,3 @@ app.notFound((c) =>
 );
 
 export default app;
-
