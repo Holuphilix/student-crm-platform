@@ -30,6 +30,12 @@ export function useCreateDealNote(dealId?: string) {
       queryClient.invalidateQueries({
         queryKey: ["deals", dealId],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["clients"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard-analytics"],
+      });
     },
   });
 }

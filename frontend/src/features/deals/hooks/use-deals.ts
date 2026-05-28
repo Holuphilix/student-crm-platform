@@ -35,6 +35,12 @@ export function useCreateDeal() {
       queryClient.invalidateQueries({
         queryKey: dealsQueryKey,
       });
+      queryClient.invalidateQueries({
+        queryKey: ["clients"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard-analytics"],
+      });
     },
   });
 }
@@ -57,6 +63,12 @@ export function useUpdateDealStage() {
       });
       queryClient.invalidateQueries({
         queryKey: ["deals", variables.dealId],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["clients"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard-analytics"],
       });
     },
   });

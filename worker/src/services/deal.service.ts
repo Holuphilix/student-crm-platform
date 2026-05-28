@@ -215,6 +215,29 @@ async function recordDealStageHistory(
   return data as DealStageHistory;
 }
 
+async function syncClientStatusToDealStage(
+  supabase: SupabaseClient,
+  payload: {
+    clientId: string;
+    stage: DealStage;
+  }
+) {
+  const { error } = await supabase
+    .from("clients")
+    .update({
+      status: payload.stage,
+    })
+    .eq("id", payload.clientId);
+
+  if (error) {
+    throw new HttpError(
+      502,
+      "CLIENT_STATUS_SYNC_FAILED",
+      error.message
+    );
+  }
+}
+
 export async function createDeal(
   supabase: SupabaseClient,
   payload: CreateDealPayload,
@@ -243,6 +266,11 @@ export async function createDeal(
   }
 
   const deal = data as Deal;
+
+  await syncClientStatusToDealStage(supabase, {
+    clientId: deal.client_id,
+    stage: deal.stage,
+  });
 
   await recordDealStageHistory(supabase, {
     deal_id: deal.id,
@@ -278,6 +306,11 @@ export async function updateDealStage(
   const currentDeal = existingDeal as Deal;
 
   if (currentDeal.stage === payload.stage) {
+    await syncClientStatusToDealStage(supabase, {
+      clientId: currentDeal.client_id,
+      stage: currentDeal.stage,
+    });
+
     return currentDeal;
   }
 
@@ -302,6 +335,13 @@ export async function updateDealStage(
     );
   }
 
+  const updatedDeal = data as Deal;
+
+  await syncClientStatusToDealStage(supabase, {
+    clientId: updatedDeal.client_id,
+    stage: updatedDeal.stage,
+  });
+
   await recordDealStageHistory(supabase, {
     deal_id: dealId,
     from_stage: currentDeal.stage,
@@ -309,7 +349,7 @@ export async function updateDealStage(
     changed_by: actorId,
   });
 
-  return data as Deal;
+  return updatedDeal;
 }
 
 export async function addDealNote(

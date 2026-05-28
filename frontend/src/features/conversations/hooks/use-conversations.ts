@@ -1,12 +1,8 @@
-import { useEffect } from "react";
-
 import {
   useMutation,
   useQuery,
   useQueryClient,
 } from "@tanstack/react-query";
-
-import { supabase } from "@/lib/supabase/supabase-client";
 
 import {
   createConversationMessage,
@@ -65,38 +61,14 @@ export function useConversations() {
             message
           )
       );
+      queryClient.invalidateQueries({
+        queryKey: ["clients"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard-analytics"],
+      });
     },
   });
-
-  useEffect(() => {
-    const channel = supabase
-      .channel("conversations-realtime")
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "conversations",
-        },
-        (payload) => {
-          queryClient.setQueryData<
-            ConversationMessage[]
-          >(
-            conversationsQueryKey,
-            (currentMessages) =>
-              upsertConversationMessage(
-                currentMessages,
-                payload.new as ConversationMessage
-              )
-          );
-        }
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(channel);
-    };
-  }, [queryClient]);
 
   return {
     ...query,

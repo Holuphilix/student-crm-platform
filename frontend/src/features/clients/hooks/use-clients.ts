@@ -41,6 +41,9 @@ export function useCreateClient() {
       queryClient.invalidateQueries({
         queryKey: ["clients"],
       });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard-analytics"],
+      });
     },
   });
 }

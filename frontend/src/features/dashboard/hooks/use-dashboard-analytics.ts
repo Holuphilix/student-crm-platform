@@ -7,7 +7,10 @@ import type {
   PipelineStageAnalytics,
 } from "@/features/dashboard/types/dashboard.types";
 
-import type { ClientStatus } from "@/features/clients/types/client.types";
+import {
+  clientStatuses,
+  type ClientStatus,
+} from "@/features/clients/types/client.types";
 
 const dashboardAnalyticsQueryKey = [
   "dashboard-analytics",
@@ -21,14 +24,39 @@ const pipelineStageColors: Record<ClientStatus, string> = {
   lost: "#dc2626",
 };
 
-function attachPipelineColors(
+function formatStatusLabel(status: ClientStatus) {
+  return status
+    .split("_")
+    .map(
+      (word) =>
+        `${word.charAt(0).toUpperCase()}${word.slice(1)}`
+    )
+    .join(" ");
+}
+
+function normalizePipelineStages(
   pipelineStages: PipelineStageAnalytics[]
 ) {
-  return pipelineStages.map((stage) => ({
-    ...stage,
-    fill: pipelineStageColors[
-      stage.status as ClientStatus
-    ],
+  const countByStatus = new Map<ClientStatus, number>();
+
+  pipelineStages.forEach((stage) => {
+    if (
+      clientStatuses.includes(
+        stage.status as ClientStatus
+      )
+    ) {
+      countByStatus.set(
+        stage.status as ClientStatus,
+        stage.count
+      );
+    }
+  });
+
+  return clientStatuses.map((status) => ({
+    status,
+    label: formatStatusLabel(status),
+    count: countByStatus.get(status) ?? 0,
+    fill: pipelineStageColors[status],
   }));
 }
 
@@ -41,7 +69,7 @@ export function useDashboardAnalytics() {
 
       return {
         ...analytics,
-        pipelineStages: attachPipelineColors(
+        pipelineStages: normalizePipelineStages(
           analytics.pipelineStages
         ),
       };

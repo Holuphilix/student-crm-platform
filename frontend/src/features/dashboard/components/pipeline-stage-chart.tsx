@@ -29,6 +29,9 @@ export function PipelineStageChart({
   isLoading = false,
 }: PipelineStageChartProps) {
   const hasData = data.some((stage) => stage.count > 0);
+  const chartDataKey = data
+    .map((stage) => `${stage.status}:${stage.count}`)
+    .join("|");
 
   return (
     <Card className="rounded-lg">
@@ -44,6 +47,7 @@ export function PipelineStageChart({
         ) : hasData ? (
           <div className="h-72">
             <ResponsiveContainer
+              key={chartDataKey}
               width="100%"
               height="100%"
             >
@@ -56,6 +60,7 @@ export function PipelineStageChart({
                   dataKey="label"
                   tickLine={false}
                   axisLine={false}
+                  interval={0}
                 />
                 <YAxis
                   allowDecimals={false}
@@ -66,6 +71,7 @@ export function PipelineStageChart({
                 <Bar
                   dataKey="count"
                   radius={[6, 6, 0, 0]}
+                  isAnimationActive={false}
                 >
                   {data.map((stage) => (
                     <Cell

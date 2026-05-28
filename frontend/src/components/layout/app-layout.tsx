@@ -9,6 +9,11 @@ import {
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
 
+import { useClientRealtime } from "@/features/realtime/hooks/use-client-realtime";
+import { useConversationRealtime } from "@/features/realtime/hooks/use-conversation-realtime";
+import { useDashboardRealtime } from "@/features/realtime/hooks/use-dashboard-realtime";
+import { useDealRealtime } from "@/features/realtime/hooks/use-deal-realtime";
+
 interface AppLayoutProps {
   children: ReactNode;
 }
@@ -16,6 +21,11 @@ interface AppLayoutProps {
 export function AppLayout({
   children,
 }: AppLayoutProps) {
+  useDashboardRealtime();
+  useClientRealtime();
+  useConversationRealtime();
+  useDealRealtime();
+
   return (
     <SidebarProvider>
       <AppSidebar />

@@ -22,12 +22,21 @@ function formatStatusLabel(status: ClientStatus) {
 function buildPipelineStages(
   clients: Client[]
 ): PipelineStageAnalytics[] {
+  const countByStatus = new Map<ClientStatus, number>(
+    clientStatuses.map((status) => [status, 0])
+  );
+
+  clients.forEach((client) => {
+    countByStatus.set(
+      client.status,
+      (countByStatus.get(client.status) ?? 0) + 1
+    );
+  });
+
   return clientStatuses.map((status) => ({
     status,
     label: formatStatusLabel(status),
-    count: clients.filter(
-      (client) => client.status === status
-    ).length,
+    count: countByStatus.get(status) ?? 0,
   }));
 }
 
