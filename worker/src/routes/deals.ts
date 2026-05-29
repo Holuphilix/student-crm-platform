@@ -109,8 +109,7 @@ export const dealsRoute = new Hono<AppBindings>()
         c.get("supabase"),
         {
           deal_id: dealId,
-          author_id:
-            payload.author_id ?? c.get("user").id,
+          author_id: c.get("user").id,
           body: payload.body,
         }
       );
@@ -175,8 +174,7 @@ export const dealsRoute = new Hono<AppBindings>()
         c.get("supabase"),
         {
           deal_id: payload.deal_id,
-          author_id:
-            payload.author_id ?? c.get("user").id,
+          author_id: c.get("user").id,
           body: payload.body,
         }
       );

@@ -13,6 +13,18 @@ export const createClientSchema = z.object({
   status: z.enum(clientStatuses).default("lead"),
 });
 
+export const registerUserSchema = z.object({
+  full_name: z.string().trim().min(1).max(160),
+  email: z.string().trim().email().max(254),
+  password: z
+    .string()
+    .min(8)
+    .regex(/[A-Z]/)
+    .regex(/[a-z]/)
+    .regex(/\d/)
+    .regex(/[^A-Za-z0-9]/),
+});
+
 export const createConversationMessageSchema = z.object({
   client_id: z.uuid(),
   message: z.string().trim().min(1).max(5000),

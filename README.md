@@ -4666,3 +4666,573 @@ Successfully implemented:
 * protected CRM resources
 * SaaS access control system
 * production-style authentication architecture
+
+## ✅ Task 16 — Authentication, Authorization, Profile Management, and User Experience Enhancements
+
+### Objective
+
+Implement a complete authentication and authorization system for the Student CRM Platform using Supabase Authentication and profile-based role management.
+
+This phase transformed the CRM from a prototype application into a production-ready platform by introducing:
+
+* user registration
+* email verification
+* secure login
+* password recovery
+* password updates
+* role-based access control
+* profile persistence
+* session management
+* authentication notifications
+* user experience enhancements
+
+## Authentication System Overview
+
+Implemented a complete authentication workflow responsible for:
+
+* account creation
+* email verification
+* user authentication
+* session management
+* password recovery
+* profile synchronization
+* role management
+* authorization enforcement
+
+The authentication architecture now operates through:
+
+```txt id="tb161"
+User
+ ↓
+Authentication Pages
+ ↓
+Supabase Auth
+ ↓
+Profiles Table
+ ↓
+CRM Dashboard
+````
+
+This architecture ensures that identity information remains synchronized across the entire platform.
+
+## Authentication Architecture
+
+### Authentication Lifecycle
+
+```mermaid
+graph TD
+
+A[User Registration]
+--> B[Supabase Auth]
+
+B --> C[Email Verification]
+
+C --> D[Profile Creation]
+
+D --> E[Profiles Table]
+
+E --> F[CRM Dashboard]
+
+F --> G[Role-Based Access Control]
+```
+
+This architecture improves:
+
+* account security
+* user management
+* profile persistence
+* authorization control
+* scalability
+
+## Authentication Features Implemented
+
+### User Registration
+
+Implemented a registration workflow supporting:
+
+* full name collection
+* email validation
+* password validation
+* password strength analysis
+* email verification
+* automatic profile creation
+
+Newly registered users are automatically stored in:
+
+* Supabase Authentication
+* CRM Profiles Table
+
+### Screenshot — Create Account Registration Page
+
+![Create Account Registration Page](./docs/screenshots/registration-create-account-page.png)
+
+This registration interface provides:
+
+* full name collection
+* email validation
+* password creation
+* password confirmation
+* password strength analysis
+* secure account onboarding
+
+### Password Strength Validation
+
+Implemented a real-time password strength meter.
+
+Validation rules include:
+
+* Minimum 8 characters
+* Uppercase letter
+* Lowercase letter
+* Numeric character
+* Special character
+
+### Screenshot — Weak Password Validation
+
+![Weak Password](./docs/screenshots/registration-password-strength-weak.png)
+
+### Screenshot — Medium Password Validation
+
+![Medium Password](./docs/screenshots/registration-password-strength-medium.png)
+
+### Screenshot — Strong Password Validation
+
+![Strong Password](./docs/screenshots/registration-password-strength-strong.png)
+
+This improves:
+
+* account security
+* password quality
+* user awareness
+* secure password creation
+* registration usability
+
+## Email Verification Workflow
+
+After registration, users receive a verification email before accessing protected CRM resources.
+
+This ensures that every account is associated with a valid and accessible email address.
+
+### Verification Process
+
+```txt id="tb162"
+Account Registration
+        ↓
+Verification Email Sent
+        ↓
+User Confirms Email
+        ↓
+Supabase Verification
+        ↓
+Account Activated
+```
+
+This workflow verifies:
+
+* email ownership
+* account authenticity
+* secure onboarding
+* trusted user registration
+
+### Screenshot — Email Verification Email
+
+![Email Verification Email](./docs/screenshots/authentication-email-verification-email.png)
+
+## Authentication Notifications
+
+Implemented a reusable toast notification system across all authentication workflows.
+
+The notification system provides immediate feedback to users during authentication-related actions.
+
+### Supported Notifications
+
+| Action                 | Notification                   |
+| ---------------------- | ------------------------------ |
+| Registration Success   | Account created successfully   |
+| Login Success          | Login successful. Welcome back |
+| Login Failure          | Invalid email or password      |
+| Logout Success         | Logged out successfully        |
+| Password Reset Request | Password reset email sent      |
+| Password Update        | Password updated successfully  |
+
+This introduced:
+
+* real-time user feedback
+* improved user experience
+* better form interaction
+* non-blocking notifications
+
+### Screenshot — Registration Success
+
+![Registration Success](./docs/screenshots/authentication-account-created-success.png)
+
+### Screenshot — Login Success
+
+![Login Success](./docs/screenshots/authentication-login-success-toast.png)
+
+### Screenshot — Logout Success
+
+![Logout Success](./docs/screenshots/authentication-logout-success-toast.png)
+
+### Screenshot — Invalid Credentials
+
+![Invalid Credentials](./docs/screenshots/authentication-login-invalid-credentials.png)
+
+## Login Security Enhancements
+
+Additional user experience safeguards were implemented to reduce authentication errors.
+
+### Caps Lock Detection
+
+The login page automatically detects when Caps Lock is enabled during password entry.
+
+This helps prevent accidental login failures caused by incorrect password casing.
+
+### Screenshot — Caps Lock Warning
+
+![Caps Lock Warning](./docs/screenshots/authentication-login-capslock-warning.png)
+
+This improves:
+
+* login accuracy
+* user experience
+* authentication reliability
+* password entry awareness
+
+## Password Recovery Architecture
+
+Implemented a complete password recovery workflow allowing users to securely regain account access.
+
+### Password Recovery Lifecycle
+
+```txt id="tb163"
+Forgot Password
+        ↓
+Reset Email Request
+        ↓
+Password Reset Email
+        ↓
+Password Reset Form
+        ↓
+Password Update
+        ↓
+Account Recovery
+```
+
+This workflow ensures secure recovery without administrator intervention.
+
+### Screenshot — Forgot Password Page
+
+![Forgot Password Page](./docs/screenshots/authentication-forgot-password-page.png)
+
+### Screenshot — Password Reset Request Success
+
+![Password Reset Success](./docs/screenshots/authentication-forgot-password-success.png)
+
+### Screenshot — Password Reset Email
+
+![Password Reset Email](./docs/screenshots/authentication-password-reset-email.png)
+
+### Screenshot — Password Reset Form
+
+![Password Reset Form](./docs/screenshots/authentication-reset-password-form.png)
+
+### Screenshot — Password Update Success
+
+![Password Update Success](./docs/screenshots/authentication-password-update-success-toast.png)
+
+This verifies:
+
+* secure account recovery
+* email-based password reset
+* secure password replacement
+* authenticated password updates
+
+## Profile Management Architecture
+
+Implemented a dedicated profiles table to extend Supabase Authentication.
+
+### Profiles Table Structure
+
+```txt
+profiles
+├── id
+├── full_name
+├── email
+├── role
+└── created_at
+```
+
+### Screenshot — Profiles Table Schema
+
+![Profiles Table Schema](./docs/screenshots/supabase-profiles-table-schema.png)
+
+The profiles table stores CRM-specific identity information separate from Supabase Authentication.
+
+This architecture allows the CRM to maintain:
+
+* user profile information
+* role assignments
+* account metadata
+* authorization data
+
+without modifying Supabase Auth directly.
+
+## Profile Synchronization
+
+Implemented automatic synchronization between:
+
+```txt
+Supabase Auth
+        ↓
+Profiles Table
+        ↓
+CRM Dashboard
+```
+
+New registrations automatically create profile records containing:
+
+* full_name
+* email
+* role
+
+### Screenshot — Supabase Authentication Users
+
+![Supabase Authentication Users](./docs/screenshots/supabase-auth-users-table.png)
+
+### Screenshot — Profiles Role Management
+
+![Profiles Role Management](./docs/screenshots/supabase-profiles-role-management.png)
+
+This verifies:
+
+* automatic profile persistence
+* profile synchronization
+* role assignment
+* role management
+* user profile storage
+
+## Dashboard Identity Synchronization
+
+Implemented user identity synchronization across the CRM dashboard.
+
+The dashboard now prioritizes identity using:
+
+```txt
+full_name
+    ↓
+email
+    ↓
+User
+```
+
+Example:
+
+```txt
+Welcome back, Philip Oludolamu
+```
+
+instead of:
+
+```txt
+Welcome back, oluphilix@gmail.com
+```
+
+This improves:
+
+* personalization
+* professional appearance
+* user experience
+* identity consistency
+
+### Screenshot — User Dashboard Overview
+
+![User Dashboard Overview](./docs/screenshots/dashboard-user-overview.png)
+
+This verifies:
+
+* successful authentication
+* dashboard access
+* authenticated user session
+* profile synchronization
+* CRM analytics rendering
+
+## Role-Based Access Control (RBAC)
+
+Implemented role-based authorization using profile records stored within the Supabase profiles table.
+
+Supported roles include:
+
+* Administrator
+* Sales (User)
+
+Authorization decisions are enforced throughout the CRM application.
+
+### Role Assignment Architecture
+
+```txt
+Supabase Profiles
+        ↓
+Role Evaluation
+        ↓
+Route Protection
+        ↓
+Feature Access Control
+```
+
+This introduced:
+
+* protected routes
+* authorization enforcement
+* feature-level permissions
+* administrative access controls
+
+### Screenshot — Unauthorized User Access
+
+![Unauthorized User Access](./docs/screenshots/account-settings-user-unauthorized.png)
+
+This verifies:
+
+* protected routes
+* role enforcement
+* access restrictions
+* RBAC functionality
+
+## Account Settings Management
+
+Implemented a centralized account management interface.
+
+The settings page allows users to manage profile information and review account details.
+
+### Features Implemented
+
+* profile information display
+* role visibility
+* account status visibility
+* password updates
+* session information
+* account metadata
+
+### Screenshot — Administrator Profile
+
+![Administrator Profile](./docs/screenshots/account-settings-admin-profile.png)
+
+### Screenshot — Account Overview
+
+![Account Overview](./docs/screenshots/account-settings-admin-overview.png)
+
+### Screenshot — Session Information
+
+![Session Information](./docs/screenshots/account-overview-session-information.png)
+
+These screens provide visibility into:
+
+* account creation date
+* last sign-in information
+* current role
+* account status
+* session expiration details
+
+### Screenshot — Password Validation Error
+
+![Password Validation Error](./docs/screenshots/account-settings-password-validation-error.png)
+
+This verifies password security enforcement and prevents unsafe password reuse.
+
+### Screenshot — Password Updated Successfully
+
+![Password Updated Successfully](./docs/screenshots/account-settings-password-updated-successfully.png)
+
+This verifies successful password updates through the account settings interface.
+
+## Supabase Backend Verification
+
+The authentication backend configuration was validated using Supabase project monitoring and administration tools.
+
+### Screenshot — Supabase Project Dashboard
+
+![Supabase Project Dashboard](./docs/screenshots/supabase-project-dashboard.png)
+
+This confirms:
+
+* Supabase project configuration
+* authentication services
+* database connectivity
+* profile storage readiness
+* backend service availability
+
+## Authentication Engineering Concepts Learned
+
+Task 16 introduced several important authentication engineering concepts.
+
+### Identity Management
+
+Managing user identities across authentication and application layers.
+
+### Profile Persistence
+
+Extending authentication providers with application-specific profile information.
+
+### Email Verification
+
+Implementing secure account ownership validation.
+
+### Password Recovery
+
+Designing secure account recovery workflows.
+
+### Role-Based Access Control
+
+Restricting functionality based on user roles.
+
+### Session Management
+
+Tracking authenticated user sessions securely.
+
+### Authentication User Experience
+
+Providing immediate feedback through validation and notifications.
+
+## Real Engineering Challenges Encountered
+
+During implementation several authentication challenges were addressed:
+
+* profile synchronization
+* Supabase profile persistence
+* role assignment workflows
+* dashboard identity rendering
+* authentication state updates
+* password reset flow validation
+* email verification integration
+* notification timing during redirects
+* role-based route protection
+
+This improved understanding of:
+
+* authentication architecture
+* identity management
+* access control systems
+* user lifecycle management
+* production authentication workflows
+
+## Task 16 Engineering Outcome
+
+Successfully implemented:
+
+* user registration system
+* email verification workflow
+* login authentication
+* logout functionality
+* password recovery workflow
+* password update system
+* password strength meter
+* profile persistence
+* profile synchronization
+* dashboard identity management
+* authentication notifications
+* session tracking
+* role-based access control
+* account settings management
+* Supabase authentication integration
+* production-ready user management architecture
+

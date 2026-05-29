@@ -11,6 +11,7 @@ export type ClientStatus =
 
 export type Client = {
   id: string;
+  owner_id?: string | null;
   full_name: string;
   email: string;
   phone: string | null;
@@ -38,6 +39,7 @@ export type ConversationSender =
 export type ConversationMessage = {
   id: string;
   client_id: string;
+  author_id?: string | null;
   message: string;
   sender: ConversationSender;
   created_at: string;

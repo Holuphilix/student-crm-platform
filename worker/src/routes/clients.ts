@@ -59,7 +59,8 @@ export const clientsRoute = new Hono<AppBindings>()
       const payload = c.req.valid("json");
       const client = await createClient(
         c.get("supabase"),
-        payload
+        payload,
+        c.get("user").id
       );
 
       return successResponse(c, client, 201);

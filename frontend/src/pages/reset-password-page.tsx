@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 
 import { toast } from "sonner";
@@ -10,28 +10,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { PasswordInput } from "@/features/auth/components/password-input";
 import { PasswordRequirements } from "@/features/auth/components/password-requirements";
-import { PasswordStrengthMeter } from "@/features/auth/components/password-strength-meter";
 import {
-  getPasswordRules,
-  isValidEmail,
-} from "@/features/auth/utils/password-validation";
+  signOutUser,
+  updateAuthenticatedPassword,
+} from "@/features/auth/services/auth.service";
+import { getPasswordRules } from "@/features/auth/utils/password-validation";
 
-export function RegisterPage() {
+export function ResetPasswordPage() {
   const navigate = useNavigate();
-  const { signUp } = useAuth();
+  const { session, loading } = useAuth();
 
-  const [fullName, setFullName] = useState("");
-  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] =
     useState("");
-  const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState("");
 
   const passwordRules = useMemo(
@@ -43,20 +40,31 @@ export function RegisterPage() {
     (rule) => rule.isValid
   );
 
-  const isEmailValid =
-    !email || isValidEmail(email);
-
   const passwordsMatch =
     password.length > 0 &&
     password === confirmPassword;
 
-  async function handleRegister(
+  useEffect(() => {
+    if (!loading && !session) {
+      setError(
+        "Password recovery session is missing or expired. Request a new reset link."
+      );
+    }
+  }, [loading, session]);
+
+  async function handleSubmit(
     event: React.FormEvent<HTMLFormElement>
   ) {
     event.preventDefault();
 
-    if (!isValidEmail(email)) {
-      setError("Enter a valid email address.");
+    if (isSaving) {
+      return;
+    }
+
+    if (!session) {
+      setError(
+        "Password recovery session is missing or expired. Request a new reset link."
+      );
       return;
     }
 
@@ -72,28 +80,29 @@ export function RegisterPage() {
       return;
     }
 
-    setLoading(true);
+    setIsSaving(true);
     setError("");
 
     try {
-      await signUp({
-        fullName,
-        email,
+      await updateAuthenticatedPassword({
         password,
       });
+      await signOutUser();
+      toast.success("Password updated successfully.");
 
-      toast.success("Account created successfully.");
-      navigate("/");
-    } catch (registerError) {
+      navigate("/login", {
+        replace: true,
+      });
+    } catch (resetError) {
       const nextError =
-        registerError instanceof Error
-          ? registerError.message
-          : "Failed to create account.";
+        resetError instanceof Error
+          ? resetError.message
+          : "Failed to update password.";
 
       setError(nextError);
       toast.error(nextError);
     } finally {
-      setLoading(false);
+      setIsSaving(false);
     }
   }
 
@@ -102,62 +111,23 @@ export function RegisterPage() {
       <Card className="w-full max-w-md rounded-lg">
         <CardHeader>
           <CardTitle className="text-2xl">
-            Create CRM Account
+            Create New Password
           </CardTitle>
         </CardHeader>
 
         <CardContent>
           <form
-            onSubmit={handleRegister}
+            onSubmit={handleSubmit}
             className="space-y-4"
           >
             <div className="space-y-2">
-              <Label htmlFor="full-name">
-                Full Name
-              </Label>
-
-              <Input
-                id="full-name"
-                placeholder="Kenny James"
-                value={fullName}
-                onChange={(event) =>
-                  setFullName(event.target.value)
-                }
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email">
-                Email
-              </Label>
-
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(event) =>
-                  setEmail(event.target.value)
-                }
-                required
-              />
-
-              {!isEmailValid && (
-                <p className="text-sm text-destructive">
-                  Enter a valid email address.
-                </p>
-              )}
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password">
-                Password
+              <Label htmlFor="new-password">
+                New Password
               </Label>
 
               <PasswordInput
-                id="password"
-                placeholder="Create password"
+                id="new-password"
+                placeholder="Enter new password"
                 value={password}
                 onChange={(event) =>
                   setPassword(event.target.value)
@@ -168,25 +138,19 @@ export function RegisterPage() {
               <PasswordRequirements
                 rules={passwordRules}
               />
-
-              <PasswordStrengthMeter
-                rules={passwordRules}
-              />
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="confirm-password">
+              <Label htmlFor="confirm-new-password">
                 Confirm Password
               </Label>
 
               <PasswordInput
-                id="confirm-password"
-                placeholder="Confirm password"
+                id="confirm-new-password"
+                placeholder="Confirm new password"
                 value={confirmPassword}
                 onChange={(event) =>
-                  setConfirmPassword(
-                    event.target.value
-                  )
+                  setConfirmPassword(event.target.value)
                 }
                 required
               />
@@ -209,24 +173,25 @@ export function RegisterPage() {
               className="w-full"
               disabled={
                 loading ||
-                !isEmailValid ||
+                isSaving ||
+                !session ||
                 !isPasswordStrong ||
                 !passwordsMatch
               }
             >
-              {loading
-                ? "Creating Account..."
-                : "Create Account"}
+              {isSaving
+                ? "Updating Password..."
+                : "Update Password"}
             </Button>
           </form>
 
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Already have an account?{" "}
+            Need a new link?{" "}
             <Link
-              to="/login"
+              to="/forgot-password"
               className="font-medium text-foreground underline-offset-4 hover:underline"
             >
-              Sign in
+              Request reset
             </Link>
           </p>
         </CardContent>

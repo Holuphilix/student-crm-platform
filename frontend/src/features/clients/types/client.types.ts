@@ -11,6 +11,7 @@ export type ClientStatus =
 
 export type Client = {
   id: string;
+  owner_id?: string | null;
   full_name: string;
   email: string;
   phone: string | null;
@@ -32,6 +33,7 @@ export type DealStage = ClientStatus;
 export type ClientConversationMessage = {
   id: string;
   client_id: string;
+  author_id?: string | null;
   message: string;
   sender: "client" | "agent";
   created_at: string;

@@ -1,15 +1,27 @@
 import { AnalyticsDashboard } from "@/features/dashboard/components/analytics-dashboard";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import {
+  getRoleDisplayName,
+  getUserDisplayName,
+} from "@/features/auth/utils/user-display";
 
 export function DashboardPage() {
+  const { user, profile, role } = useAuth();
+  const displayName = getUserDisplayName(
+    user,
+    profile
+  );
+  const roleLabel = getRoleDisplayName(role);
+
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
-          CRM Analytics
+          Welcome back, {displayName}
         </h1>
 
         <p className="mt-2 text-sm text-muted-foreground">
-          Live client, pipeline, and conversation performance.
+          {roleLabel}
         </p>
       </div>
 

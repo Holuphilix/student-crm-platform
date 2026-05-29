@@ -31,11 +31,15 @@ export async function getClients(
 
 export async function createClient(
   supabase: SupabaseClient,
-  payload: CreateClientPayload
+  payload: CreateClientPayload,
+  actorId: string
 ): Promise<Client> {
   const { data, error } = await supabase
     .from("clients")
-    .insert(payload)
+    .insert({
+      ...payload,
+      owner_id: actorId,
+    })
     .select()
     .single();
 

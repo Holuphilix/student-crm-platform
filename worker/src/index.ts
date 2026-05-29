@@ -10,6 +10,7 @@ import { authMiddleware } from "./middleware/auth";
 import { errorHandlingMiddleware } from "./middleware/error-handling";
 import { requestLoggingMiddleware } from "./middleware/request-logging";
 
+import { authRoute } from "./routes/auth";
 import { clientsRoute } from "./routes/clients";
 import { conversationsRoute } from "./routes/conversations";
 import { dashboardRoute } from "./routes/dashboard";
@@ -88,6 +89,8 @@ app.get("/", (c) =>
     version: "v1",
   })
 );
+
+app.route("/api/auth", authRoute);
 
 app.use("/api/*", authMiddleware);
 

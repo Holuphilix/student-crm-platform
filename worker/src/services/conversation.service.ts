@@ -29,11 +29,15 @@ export async function getConversations(
 
 export async function createConversationMessage(
   supabase: SupabaseClient,
-  payload: CreateConversationMessagePayload
+  payload: CreateConversationMessagePayload,
+  actorId: string
 ): Promise<ConversationMessage> {
   const { data, error } = await supabase
     .from("conversations")
-    .insert(payload)
+    .insert({
+      ...payload,
+      author_id: actorId,
+    })
     .select()
     .single();
 

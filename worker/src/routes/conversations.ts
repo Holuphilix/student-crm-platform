@@ -38,7 +38,8 @@ export const conversationsRoute = new Hono<AppBindings>()
       const payload = c.req.valid("json");
       const conversation = await createConversationMessage(
         c.get("supabase"),
-        payload
+        payload,
+        c.get("user").id
       );
 
       return successResponse(c, conversation, 201);

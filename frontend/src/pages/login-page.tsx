@@ -4,13 +4,19 @@ import {
   useLocation,
   useNavigate,
 } from "react-router-dom";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
+import { PasswordInput } from "@/features/auth/components/password-input";
 import { useAuth } from "@/features/auth/hooks/use-auth";
+import { isValidEmail } from "@/features/auth/utils/password-validation";
+
+const rememberMeStorageKey =
+  "student-crm-remember-me";
 
 export function LoginPage() {
   const navigate = useNavigate();
@@ -21,20 +27,60 @@ export function LoginPage() {
   const [password, setPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
-
+  const [rememberMe, setRememberMe] = useState(
+    () =>
+      window.localStorage.getItem(
+        rememberMeStorageKey
+      ) === "true"
+  );
+  const [hasSubmitted, setHasSubmitted] =
+    useState(false);
+  const [isCapsLockOn, setIsCapsLockOn] =
+    useState(false);
   const [error, setError] = useState("");
+
+  const emailValidationMessage = !email
+    ? "Email is required."
+    : !isValidEmail(email)
+      ? "Invalid email format."
+      : "";
+
+  const passwordValidationMessage = !password
+    ? "Password is required."
+    : password.length < 8
+      ? "Password must be at least 8 characters."
+      : "";
 
   async function handleLogin(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
 
+    if (loading) {
+      return;
+    }
+
+    setHasSubmitted(true);
     setLoading(true);
     setError("");
+
+    if (
+      emailValidationMessage ||
+      passwordValidationMessage
+    ) {
+      setLoading(false);
+      return;
+    }
 
     try {
       await signIn({
         email,
         password,
       });
+
+      window.localStorage.setItem(
+        rememberMeStorageKey,
+        String(rememberMe)
+      );
+      toast.success("Login successful. Welcome back.");
 
       const redirectTo =
         (
@@ -46,12 +92,11 @@ export function LoginPage() {
       navigate(redirectTo, {
         replace: true,
       });
-    } catch (loginError) {
-      setError(
-        loginError instanceof Error
-          ? loginError.message
-          : "Failed to sign in."
-      );
+    } catch {
+      const nextError = "Invalid email or password.";
+
+      setError(nextError);
+      toast.error(nextError);
     } finally {
       setLoading(false);
     }
@@ -86,23 +131,82 @@ export function LoginPage() {
                 }
                 required
               />
+
+              {hasSubmitted &&
+                emailValidationMessage && (
+                  <p className="text-sm text-destructive">
+                    {emailValidationMessage}
+                  </p>
+                )}
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password">
-                Password
-              </Label>
+              <div className="flex items-center justify-between gap-3">
+                <Label htmlFor="password">
+                  Password
+                </Label>
 
-              <Input
+                <Link
+                  to="/forgot-password"
+                  className="text-xs font-medium text-muted-foreground underline-offset-4 hover:text-foreground hover:underline"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+
+              <PasswordInput
                 id="password"
-                type="password"
                 placeholder="Enter password"
                 value={password}
                 onChange={(event) =>
                   setPassword(event.target.value)
                 }
+                onKeyDown={(event) =>
+                  setIsCapsLockOn(
+                    event.getModifierState("CapsLock")
+                  )
+                }
+                onKeyUp={(event) =>
+                  setIsCapsLockOn(
+                    event.getModifierState("CapsLock")
+                  )
+                }
+                onBlur={() => setIsCapsLockOn(false)}
                 required
               />
+
+              {isCapsLockOn && (
+                <p className="text-sm text-destructive">
+                  Caps Lock is on
+                </p>
+              )}
+
+              {hasSubmitted &&
+                passwordValidationMessage && (
+                  <p className="text-sm text-destructive">
+                    {passwordValidationMessage}
+                  </p>
+                )}
+
+            </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                id="remember-me"
+                type="checkbox"
+                checked={rememberMe}
+                className="h-4 w-4 rounded border border-input"
+                onChange={(event) =>
+                  setRememberMe(event.target.checked)
+                }
+              />
+
+              <Label
+                htmlFor="remember-me"
+                className="text-sm font-normal text-muted-foreground"
+              >
+                Remember Me
+              </Label>
             </div>
 
             {error && (
@@ -116,7 +220,7 @@ export function LoginPage() {
               className="w-full"
               disabled={loading}
             >
-              {loading ? "Signing in..." : "Sign In"}
+              {loading ? "Signing In..." : "Sign In"}
             </Button>
           </form>
 

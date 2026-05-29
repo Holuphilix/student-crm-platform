@@ -6,6 +6,7 @@ import {
 
 import type { ReactNode } from "react";
 import type { Session, User } from "@supabase/supabase-js";
+import { toast } from "sonner";
 
 import { supabase } from "@/lib/supabase/supabase-client";
 import {
@@ -13,10 +14,16 @@ import {
   signOutUser,
   signUpWithEmail,
 } from "@/features/auth/services/auth.service";
+import {
+  ensureUserProfile,
+  getUserProfile,
+  updateAuthenticatedProfile,
+} from "@/features/auth/services/profile.service";
 import type {
   AuthContextType,
   SignInPayload,
   SignUpPayload,
+  UpdateProfilePayload,
   UserProfile,
 } from "@/features/auth/types/auth.types";
 
@@ -26,22 +33,6 @@ export const AuthContext = createContext<AuthContextType | undefined>(
 
 interface AuthProviderProps {
   children: ReactNode;
-}
-
-async function getUserProfile(
-  userId: string
-): Promise<UserProfile | null> {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("id, role, created_at")
-    .eq("id", userId)
-    .maybeSingle();
-
-  if (error) {
-    throw new Error(error.message);
-  }
-
-  return data;
 }
 
 export function AuthProvider({ children }: AuthProviderProps) {
@@ -59,11 +50,62 @@ export function AuthProvider({ children }: AuthProviderProps) {
   }
 
   async function signUp(payload: SignUpPayload) {
-    await signUpWithEmail(payload);
+    const result = await signUpWithEmail(payload);
+
+    if (result.session) {
+      setSession(result.session);
+    }
+
+    if (result.user) {
+      setUser(result.user);
+    }
+
+    if (result.profile) {
+      setProfile(result.profile);
+    } else if (result.user) {
+      const nextProfile = await getUserProfile(
+        result.user
+      );
+
+      setProfile(nextProfile);
+    }
   }
 
   async function signOut() {
     await signOutUser();
+  }
+
+  async function updateProfile(
+    payload: UpdateProfilePayload
+  ) {
+    if (!user) {
+      throw new Error("You must be signed in.");
+    }
+
+    try {
+      await updateAuthenticatedProfile(user, payload);
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to update profile."
+      );
+      throw error;
+    }
+
+    const {
+      data: { session: nextSession },
+    } = await supabase.auth.getSession();
+
+    setSession(nextSession);
+    setUser(nextSession?.user ?? user);
+
+    const nextProfile = await getUserProfile(
+      nextSession?.user ?? user
+    );
+
+    setProfile(nextProfile);
+    toast.success("Profile updated successfully.");
   }
 
   useEffect(() => {
@@ -85,9 +127,20 @@ export function AuthProvider({ children }: AuthProviderProps) {
       }
 
       try {
-        const nextProfile = await getUserProfile(
-          nextUser.id
-        );
+        const existingProfile =
+          await getUserProfile(nextUser);
+        const nextProfile =
+          existingProfile ??
+          (await ensureUserProfile({
+            user: nextUser,
+            fullName:
+              typeof nextUser.user_metadata
+                ?.full_name === "string"
+                ? nextUser.user_metadata.full_name
+                : undefined,
+            email: nextUser.email,
+            role: "user",
+          }));
 
         if (!isMounted) {
           return;
@@ -143,6 +196,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
         signIn,
         signUp,
         signOut,
+        updateProfile,
       }}
     >
       {children}

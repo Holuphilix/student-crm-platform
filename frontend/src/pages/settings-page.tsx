@@ -1,4 +1,33 @@
+import {
+  Card,
+  CardContent,
+} from "@/components/ui/card";
+
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { AccountMetadataCard } from "@/features/settings/components/account-metadata-card";
+import { EmailSettingsCard } from "@/features/settings/components/email-settings-card";
+import { PasswordSettingsCard } from "@/features/settings/components/password-settings-card";
+import { ProfileSettingsCard } from "@/features/settings/components/profile-settings-card";
+
 export function SettingsPage() {
+  const {
+    user,
+    session,
+    profile,
+  } = useAuth();
+
+  if (!user) {
+    return (
+      <Card>
+        <CardContent className="py-6">
+          <p className="text-sm text-destructive">
+            You must be signed in to manage settings.
+          </p>
+        </CardContent>
+      </Card>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div>
@@ -6,48 +35,27 @@ export function SettingsPage() {
           Account Settings
         </h1>
 
-        <p className="text-muted-foreground mt-2">
-          Manage your profile, security, and CRM preferences.
+        <p className="mt-2 text-sm text-muted-foreground">
+          Manage your profile, session, and account identity.
         </p>
       </div>
 
-      <div className="border rounded-lg p-6 space-y-4 max-w-2xl">
-        <div>
-          <h2 className="font-semibold text-lg">
-            User Information
-          </h2>
-        </div>
+      <ProfileSettingsCard
+        user={user}
+        profile={profile}
+      />
 
-        <div className="space-y-2">
-          <p>
-            <span className="font-medium">Role:</span>{" "}
-            Administrator
-          </p>
+      <div className="grid gap-4 xl:grid-cols-2">
+        <EmailSettingsCard user={user} />
 
-          <p>
-            <span className="font-medium">Access Level:</span>{" "}
-            Full CRM Access
-          </p>
-
-          <p>
-            <span className="font-medium">Status:</span>{" "}
-            Active
-          </p>
-        </div>
+        <PasswordSettingsCard />
       </div>
 
-      <div className="border rounded-lg p-6 max-w-2xl">
-        <h2 className="font-semibold text-lg mb-2">
-          Coming Soon
-        </h2>
-
-        <p className="text-muted-foreground">
-          Advanced profile management, organization
-          settings, notification preferences, and
-          account security controls will be available
-          in future updates.
-        </p>
-      </div>
+      <AccountMetadataCard
+        user={user}
+        session={session}
+        profile={profile}
+      />
     </div>
   );
 }

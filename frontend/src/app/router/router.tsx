@@ -12,8 +12,10 @@ import { ConversationsPage } from "@/pages/conversations-page";
 import { DashboardPage } from "@/pages/dashboard-page";
 import { DealDetailPage } from "@/pages/deal-detail-page";
 import { DealsPage } from "@/pages/deals-page";
+import { ForgotPasswordPage } from "@/pages/forgot-password-page";
 import { LoginPage } from "@/pages/login-page";
 import { RegisterPage } from "@/pages/register-page";
+import { ResetPasswordPage } from "@/pages/reset-password-page";
 import { SettingsPage } from "@/pages/settings-page";
 
 export const router = createBrowserRouter([
@@ -33,6 +35,20 @@ export const router = createBrowserRouter([
         <RegisterPage />
       </PublicOnlyRoute>
     ),
+  },
+
+  {
+    path: "/forgot-password",
+    element: (
+      <PublicOnlyRoute>
+        <ForgotPasswordPage />
+      </PublicOnlyRoute>
+    ),
+  },
+
+  {
+    path: "/reset-password",
+    element: <ResetPasswordPage />,
   },
 
   {

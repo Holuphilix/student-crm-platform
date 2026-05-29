@@ -243,13 +243,11 @@ export async function createDeal(
   payload: CreateDealPayload,
   actorId: string
 ): Promise<Deal> {
-  const ownerId = payload.owner_id ?? actorId;
-
   const { data, error } = await supabase
     .from("deals")
     .insert({
       client_id: payload.client_id,
-      owner_id: ownerId,
+      owner_id: actorId,
       title: payload.title,
       value_amount: payload.value_amount ?? null,
       expected_intake: payload.expected_intake ?? null,
