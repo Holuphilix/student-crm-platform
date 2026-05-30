@@ -1,8 +1,13 @@
-name = "student-crm-api"
+name = "student-crm-platform"
 main = "src/index.ts"
-compatibility_date = "2026-05-27"
+compatibility_date = "2026-05-30"
+
+[assets]
+directory = "../frontend/dist"
+not_found_handling = "single-page-application"
 
 [vars]
+CORS_ORIGIN = "https://student-crm-platform.student-crm-platform.workers.dev"
 # Configure these in Cloudflare dashboard or with `wrangler secret put`.
 # SUPABASE_URL = ""
 # SUPABASE_SERVICE_ROLE_KEY = ""

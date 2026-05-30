@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "wrangler dev",
     "deploy": "wrangler deploy",
+    "deploy:root-config": "wrangler deploy --config ../wrangler.jsonc",
+    "deploy:dry-run": "wrangler deploy --dry-run",
+    "deploy:root-dry-run": "wrangler deploy --dry-run --config ../wrangler.jsonc",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
