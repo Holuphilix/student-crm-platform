@@ -1,4 +1,5 @@
 import { supabase } from "@/lib/supabase/supabase-client";
+import { assertSupabaseConfigured } from "@/lib/supabase/supabase-client";
 import { apiClient } from "@/lib/api/client";
 
 import type {
@@ -23,6 +24,8 @@ type RegisterUserResponse = {
 export async function signInWithEmail(
   payload: SignInPayload
 ) {
+  assertSupabaseConfigured();
+
   const { error } =
     await supabase.auth.signInWithPassword({
       email: payload.email,
@@ -37,6 +40,8 @@ export async function signInWithEmail(
 export async function signUpWithEmail(
   payload: SignUpPayload
 ): Promise<SignUpResult> {
+  assertSupabaseConfigured();
+
   const registration =
     await apiClient<RegisterUserResponse>(
       "/api/auth/register",
@@ -82,6 +87,8 @@ export async function signUpWithEmail(
 export async function requestPasswordRecovery(
   payload: PasswordRecoveryPayload
 ) {
+  assertSupabaseConfigured();
+
   const { error } =
     await supabase.auth.resetPasswordForEmail(
       payload.email,
@@ -98,6 +105,8 @@ export async function requestPasswordRecovery(
 export async function updateAuthenticatedPassword(
   payload: UpdatePasswordPayload
 ) {
+  assertSupabaseConfigured();
+
   const { error } = await supabase.auth.updateUser({
     password: payload.password,
   });
@@ -110,6 +119,8 @@ export async function updateAuthenticatedPassword(
 export async function updateAuthenticatedEmail(
   payload: UpdateEmailPayload
 ) {
+  assertSupabaseConfigured();
+
   const { data, error } =
     await supabase.auth.updateUser({
       email: payload.email,
@@ -147,6 +158,8 @@ export async function updateAuthenticatedEmail(
 }
 
 export async function signOutUser() {
+  assertSupabaseConfigured();
+
   const { error } = await supabase.auth.signOut();
 
   if (error) {

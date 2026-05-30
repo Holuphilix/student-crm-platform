@@ -12,18 +12,27 @@ import { QueryProvider } from "@/app/providers/query-provider";
 
 import { router } from "@/app/router/router";
 
+import { AppErrorBoundary } from "@/components/app-error-boundary";
+import { StartupConfigurationError } from "@/components/startup-configuration-error";
 import { AuthProvider } from "@/features/auth/providers/auth-provider";
+import { isSupabaseConfigured } from "@/lib/supabase/supabase-client";
 
 ReactDOM.createRoot(
   document.getElementById("root")!
 ).render(
   <React.StrictMode>
-    <QueryProvider>
-      <AuthProvider>
-        <RouterProvider router={router} />
+    <AppErrorBoundary>
+      {isSupabaseConfigured ? (
+        <QueryProvider>
+          <AuthProvider>
+            <RouterProvider router={router} />
 
-        <Toaster richColors />
-      </AuthProvider>
-    </QueryProvider>
+            <Toaster richColors />
+          </AuthProvider>
+        </QueryProvider>
+      ) : (
+        <StartupConfigurationError />
+      )}
+    </AppErrorBoundary>
   </React.StrictMode>
 );

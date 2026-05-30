@@ -9,6 +9,7 @@ import type { Session, User } from "@supabase/supabase-js";
 import { toast } from "sonner";
 
 import { supabase } from "@/lib/supabase/supabase-client";
+import { isSupabaseConfigured } from "@/lib/supabase/supabase-client";
 import {
   signInWithEmail,
   signOutUser,
@@ -110,6 +111,14 @@ export function AuthProvider({ children }: AuthProviderProps) {
 
   useEffect(() => {
     let isMounted = true;
+
+    if (!isSupabaseConfigured) {
+      setLoading(false);
+
+      return () => {
+        isMounted = false;
+      };
+    }
 
     async function resolveAuthState(
       nextSession: Session | null
