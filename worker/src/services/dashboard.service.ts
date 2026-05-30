@@ -1,4 +1,5 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
+import type { PostgrestError } from "@supabase/supabase-js";
 
 import { HttpError } from "../lib/http-error";
 import {
@@ -8,6 +9,62 @@ import {
   type DashboardAnalytics,
   type PipelineStageAnalytics,
 } from "../types/domain";
+
+type DashboardQueryContext = {
+  requestId?: string;
+  actorId?: string;
+};
+
+type DashboardQueryFailure = {
+  query: string;
+  table: string;
+  error: PostgrestError;
+  requestId?: string;
+  actorId?: string;
+};
+
+function logDashboardQueryFailure(
+  failure: DashboardQueryFailure
+) {
+  console.error(
+    JSON.stringify({
+      event: "dashboard_query_failed",
+      requestId: failure.requestId,
+      actorId: failure.actorId,
+      query: failure.query,
+      table: failure.table,
+      supabase: {
+        code: failure.error.code,
+        message: failure.error.message,
+        details: failure.error.details,
+        hint: failure.error.hint,
+      },
+    })
+  );
+}
+
+function throwDashboardQueryError(
+  failure: DashboardQueryFailure
+): never {
+  logDashboardQueryFailure(failure);
+
+  throw new HttpError(
+    502,
+    "DASHBOARD_QUERY_FAILED",
+    `Dashboard ${failure.query} query failed.`,
+    {
+      query: failure.query,
+      table: failure.table,
+      supabase: {
+        code: failure.error.code,
+        message: failure.error.message,
+        details: failure.error.details,
+        hint: failure.error.hint,
+      },
+      requestId: failure.requestId,
+    }
+  );
+}
 
 function formatStatusLabel(status: ClientStatus) {
   return status
@@ -41,13 +98,28 @@ function buildPipelineStages(
 }
 
 export async function getDashboardAnalytics(
-  supabase: SupabaseClient
+  supabase: SupabaseClient,
+  context: DashboardQueryContext = {}
 ): Promise<DashboardAnalytics> {
+  console.log(
+    JSON.stringify({
+      event: "dashboard_analytics_fetch_started",
+      requestId: context.requestId,
+      actorId: context.actorId,
+      queries: [
+        "clients_pipeline_source",
+        "conversations_count",
+      ],
+    })
+  );
+
   const [clientsResponse, conversationsResponse] =
     await Promise.all([
       supabase
         .from("clients")
-        .select("*")
+        .select(
+          "id, full_name, email, phone, company, status, created_at"
+        )
         .order("created_at", {
           ascending: false,
         }),
@@ -61,19 +133,21 @@ export async function getDashboardAnalytics(
     ]);
 
   if (clientsResponse.error) {
-    throw new HttpError(
-      502,
-      "DASHBOARD_CLIENTS_FETCH_FAILED",
-      clientsResponse.error.message
-    );
+    throwDashboardQueryError({
+      query: "clients_pipeline_source",
+      table: "clients",
+      error: clientsResponse.error,
+      ...context,
+    });
   }
 
   if (conversationsResponse.error) {
-    throw new HttpError(
-      502,
-      "DASHBOARD_CONVERSATIONS_FETCH_FAILED",
-      conversationsResponse.error.message
-    );
+    throwDashboardQueryError({
+      query: "conversations_count",
+      table: "conversations",
+      error: conversationsResponse.error,
+      ...context,
+    });
   }
 
   const clients = (clientsResponse.data ?? []) as Client[];

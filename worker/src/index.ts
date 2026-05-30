@@ -5,6 +5,7 @@ import {
   errorResponse,
   successResponse,
 } from "./lib/api-response";
+import { getSupabaseEnvironmentDiagnostics } from "./lib/supabase";
 
 import { authMiddleware } from "./middleware/auth";
 import { errorHandlingMiddleware } from "./middleware/error-handling";
@@ -81,6 +82,26 @@ app.get("/health", (c) =>
     status: "ok",
   })
 );
+
+app.get("/health/config", (c) => {
+  const supabaseDiagnostics =
+    getSupabaseEnvironmentDiagnostics(c.env);
+
+  console.log(
+    JSON.stringify({
+      requestId: c.get("requestId"),
+      event: "worker_config_diagnostics",
+      supabase: supabaseDiagnostics,
+    })
+  );
+
+  return successResponse(c, {
+    status: supabaseDiagnostics.isConfigured
+      ? "configured"
+      : "missing_configuration",
+    supabase: supabaseDiagnostics,
+  });
+});
 
 app.get("/", (c) =>
   successResponse(c, {

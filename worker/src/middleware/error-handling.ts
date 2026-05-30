@@ -10,12 +10,28 @@ export const errorHandlingMiddleware: ErrorHandler<
   AppBindings
 > = (error, c) => {
   const requestId = c.get("requestId");
+  const method = c.req.method;
+  const path = new URL(c.req.url).pathname;
 
   console.error(
     JSON.stringify({
       requestId,
+      method,
+      path,
       event: "request_error",
+      code:
+        error instanceof HttpError
+          ? error.code
+          : "UNHANDLED_ERROR",
+      status:
+        error instanceof HttpError
+          ? error.status
+          : undefined,
       message: error.message,
+      details:
+        error instanceof HttpError
+          ? error.details
+          : undefined,
       stack: error.stack,
     })
   );
@@ -26,7 +42,15 @@ export const errorHandlingMiddleware: ErrorHandler<
       error.code,
       error.message,
       error.status,
-      error.details
+      {
+        requestId,
+        path,
+        ...(error.details &&
+        typeof error.details === "object" &&
+        !Array.isArray(error.details)
+          ? error.details
+          : { details: error.details }),
+      }
     );
   }
 
@@ -36,7 +60,11 @@ export const errorHandlingMiddleware: ErrorHandler<
       "VALIDATION_ERROR",
       "Request validation failed.",
       400,
-      error.issues
+      {
+        requestId,
+        path,
+        issues: error.issues,
+      }
     );
   }
 
@@ -45,7 +73,11 @@ export const errorHandlingMiddleware: ErrorHandler<
       c,
       "HTTP_ERROR",
       error.message,
-      error.status
+      error.status,
+      {
+        requestId,
+        path,
+      }
     );
   }
 
@@ -53,6 +85,10 @@ export const errorHandlingMiddleware: ErrorHandler<
     c,
     "INTERNAL_SERVER_ERROR",
     "An unexpected error occurred.",
-    500
+    500,
+    {
+      requestId,
+      path,
+    }
   );
 };

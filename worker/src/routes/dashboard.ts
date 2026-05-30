@@ -8,9 +8,15 @@ export const dashboardRoute = new Hono<AppBindings>().get(
   "/",
   async (c) => {
     const dashboard = await getDashboardAnalytics(
-      c.get("supabase")
+      c.get("supabase"),
+      {
+        requestId: c.get("requestId"),
+        actorId: c.get("user").id,
+      }
     );
 
-    return successResponse(c, dashboard);
+    return successResponse(c, dashboard, 200, {
+      requestId: c.get("requestId"),
+    });
   }
 );
