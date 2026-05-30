@@ -4711,7 +4711,7 @@ Supabase Auth
 Profiles Table
  ↓
 CRM Dashboard
-````
+```
 
 This architecture ensures that identity information remains synchronized across the entire platform.
 
