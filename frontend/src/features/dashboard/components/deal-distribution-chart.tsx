@@ -5,6 +5,7 @@ import {
   ResponsiveContainer,
   Tooltip,
 } from "recharts";
+import { Link } from "react-router-dom";
 
 import {
   Card,
@@ -74,9 +75,10 @@ export function DealDistributionChart({
 
             <div className="grid grid-cols-2 gap-2 text-xs sm:grid-cols-5">
               {data.map((stage) => (
-                <div
+                <Link
                   key={stage.status}
-                  className="flex items-center gap-2"
+                  to={`/deals?stage=${stage.status}`}
+                  className="flex items-center gap-2 rounded-md p-1 transition hover:bg-muted"
                 >
                   <span
                     className="h-2.5 w-2.5 rounded-full"
@@ -87,7 +89,7 @@ export function DealDistributionChart({
                   <span className="truncate text-muted-foreground">
                     {stage.label}: {stage.count}
                   </span>
-                </div>
+                </Link>
               ))}
             </div>
           </div>

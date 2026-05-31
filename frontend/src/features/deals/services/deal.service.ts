@@ -4,6 +4,7 @@ import type {
   CreateDealPayload,
   Deal,
   DealWithClient,
+  UpdateDealOwnerPayload,
   UpdateDealStagePayload,
 } from "@/features/deals/types/deal.types";
 
@@ -26,6 +27,19 @@ export async function updateDealStage(
 ): Promise<Deal> {
   return apiClient<Deal>(
     `/api/deals/${dealId}/stage`,
+    {
+      method: "PATCH",
+      body: JSON.stringify(payload),
+    }
+  );
+}
+
+export async function updateDealOwner(
+  dealId: string,
+  payload: UpdateDealOwnerPayload
+): Promise<Deal> {
+  return apiClient<Deal>(
+    `/api/deals/${dealId}/owner`,
     {
       method: "PATCH",
       body: JSON.stringify(payload),

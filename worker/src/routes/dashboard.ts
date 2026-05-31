@@ -11,7 +11,7 @@ export const dashboardRoute = new Hono<AppBindings>().get(
       c.get("supabase"),
       {
         requestId: c.get("requestId"),
-        actorId: c.get("user").id,
+        actor: c.get("user"),
       }
     );
 

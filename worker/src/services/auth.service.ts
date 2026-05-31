@@ -12,7 +12,7 @@ export type RegisteredProfile = {
   id: string;
   full_name: string | null;
   email: string | null;
-  role: "user" | "admin" | "sales" | "manager";
+  role: "client" | "user" | "admin" | "sales" | "manager";
   created_at: string;
 };
 
@@ -22,6 +22,17 @@ export type RegisteredUserResponse = {
     email: string | null;
   };
   profile: RegisteredProfile;
+};
+
+type RegisteredClient = {
+  id: string;
+  profile_id?: string | null;
+  full_name: string;
+  email: string;
+  phone: string | null;
+  country?: string | null;
+  target_country?: string | null;
+  created_at: string;
 };
 
 function isAlreadyRegisteredError(message: string) {
@@ -48,6 +59,7 @@ export async function registerUser(
       email_confirm: true,
       user_metadata: {
         full_name: fullName,
+        role: "client",
       },
     });
 
@@ -69,8 +81,25 @@ export async function registerUser(
     );
   }
 
-  const { data: profile, error: profileError } =
+  let { data: profile, error: profileError } =
     await supabase
+      .from("profiles")
+      .upsert(
+        {
+          id: authData.user.id,
+          full_name: fullName,
+          email,
+          role: "client",
+        },
+        {
+          onConflict: "id",
+        }
+      )
+      .select("id, full_name, email, role, created_at")
+      .single<RegisteredProfile>();
+
+  if (profileError) {
+    const fallbackProfileResponse = await supabase
       .from("profiles")
       .upsert(
         {
@@ -86,6 +115,10 @@ export async function registerUser(
       .select("id, full_name, email, role, created_at")
       .single<RegisteredProfile>();
 
+    profile = fallbackProfileResponse.data;
+    profileError = fallbackProfileResponse.error;
+  }
+
   if (profileError || !profile) {
     await supabase.auth.admin.deleteUser(
       authData.user.id
@@ -96,6 +129,67 @@ export async function registerUser(
       "PROFILE_CREATION_FAILED",
       profileError?.message ??
         "Profile could not be created for the registered user."
+    );
+  }
+
+  const clientResponse = await supabase
+    .from("clients")
+    .upsert(
+      {
+        profile_id: authData.user.id,
+        full_name: fullName,
+        email,
+        status: "new_lead",
+      },
+      {
+        onConflict: "profile_id",
+      }
+    )
+    .select("id, profile_id, full_name, email, phone, country, target_country, created_at")
+    .single<RegisteredClient>();
+
+  let registeredClient = clientResponse.data;
+  let clientError = clientResponse.error;
+
+  if (clientError) {
+    const existingClientResponse = await supabase
+      .from("clients")
+      .select("id, full_name, email, phone, created_at")
+      .eq("email", email)
+      .maybeSingle<RegisteredClient>();
+
+    if (
+      existingClientResponse.data &&
+      !existingClientResponse.error
+    ) {
+      registeredClient = existingClientResponse.data;
+      clientError = null;
+    } else {
+      const fallbackClientResponse = await supabase
+        .from("clients")
+        .insert({
+          full_name: fullName,
+          email,
+          status: "new_lead",
+        })
+        .select("id, full_name, email, phone, created_at")
+        .single<RegisteredClient>();
+
+      registeredClient = fallbackClientResponse.data;
+      clientError = fallbackClientResponse.error;
+    }
+  }
+
+  if (clientError || !registeredClient) {
+    await supabase.auth.admin.deleteUser(
+      authData.user.id
+    );
+
+    throw new HttpError(
+      500,
+      "CLIENT_RECORD_CREATION_FAILED",
+      clientError?.message ??
+        "CRM client record could not be created for the registered user."
     );
   }
 

@@ -7,6 +7,7 @@ import type {
   ClientDetailApiPayload,
   ClientDetailApiResponse,
   CreateClientPayload,
+  UpdateClientPayload,
 } from "@/features/clients/types/client.types";
 
 export async function getClients(): Promise<Client[]> {
@@ -19,6 +20,16 @@ export async function createClient(
   return apiClient<Client>("/api/clients", {
     method: "POST",
 
+    body: JSON.stringify(payload),
+  });
+}
+
+export async function updateClient(
+  clientId: string,
+  payload: UpdateClientPayload
+): Promise<Client> {
+  return apiClient<Client>(`/api/clients/${clientId}`, {
+    method: "PATCH",
     body: JSON.stringify(payload),
   });
 }

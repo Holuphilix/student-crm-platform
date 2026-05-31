@@ -14,9 +14,11 @@ import { DealDetailPage } from "@/pages/deal-detail-page";
 import { DealsPage } from "@/pages/deals-page";
 import { ForgotPasswordPage } from "@/pages/forgot-password-page";
 import { LoginPage } from "@/pages/login-page";
+import { ProfilePage } from "@/pages/profile-page";
 import { RegisterPage } from "@/pages/register-page";
 import { ResetPasswordPage } from "@/pages/reset-password-page";
 import { SettingsPage } from "@/pages/settings-page";
+import { UsersPage } from "@/pages/users-page";
 
 export const router = createBrowserRouter([
   {
@@ -122,8 +124,32 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <AppLayout>
-          <RoleProtectedRoute allowedRoles={["admin"]}>
-            <SettingsPage />
+          <SettingsPage />
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/profile",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <RoleProtectedRoute allowedRoles={["client", "user"]}>
+            <ProfilePage />
+          </RoleProtectedRoute>
+        </AppLayout>
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/users",
+    element: (
+      <ProtectedRoute>
+        <AppLayout>
+          <RoleProtectedRoute allowedRoles={["admin", "manager"]}>
+            <UsersPage />
           </RoleProtectedRoute>
         </AppLayout>
       </ProtectedRoute>

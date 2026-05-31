@@ -14,6 +14,28 @@ Full stack CRM platform built for the SINC Full Stack Developer Test of Competen
 
 **Production CRM URL:** https://student-crm-platform.student-crm-platform.workers.dev
 
+## Demo Login Details
+
+Seeded reviewer accounts are documented in:
+
+```txt
+docs/demo-login-details.md
+```
+
+Default demo accounts:
+
+| Role | Email | Password |
+| --- | --- | --- |
+| Administrator / Manager | `admin@studentcrm.test` | `StudentCRM@2026` |
+| Sales Representative | `sales@studentcrm.test` | `StudentCRM@2026` |
+| Client | `user@studentcrm.test` | `StudentCRM@2026` |
+
+Create or update these accounts in Supabase with:
+
+```bash
+npm --prefix worker run seed:demo-users
+```
+
 # 📌 Project Overview
 
 Student CRM Platform is a production-style full stack CRM application designed for education sales teams.

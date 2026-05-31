@@ -63,6 +63,24 @@ export function ClientProfileCard({
 
         <div>
           <p className="text-xs font-medium text-muted-foreground">
+            Country
+          </p>
+          <p className="mt-1 text-sm">
+            {client.country || "Not provided"}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium text-muted-foreground">
+            Target Country
+          </p>
+          <p className="mt-1 text-sm">
+            {client.target_country || "Not provided"}
+          </p>
+        </div>
+
+        <div>
+          <p className="text-xs font-medium text-muted-foreground">
             Created
           </p>
           <p className="mt-1 text-sm">

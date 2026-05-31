@@ -62,7 +62,7 @@ export function ClientsPage() {
         email,
         phone,
         company,
-        status: "lead",
+        status: "new_lead",
       });
 
       toast.success(

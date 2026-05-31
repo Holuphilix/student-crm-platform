@@ -9,6 +9,7 @@ type ConversationListProps = {
   messages: ConversationMessage[];
   selectedClientId: string | null;
   onSelectClient: (clientId: string) => void;
+  emptyLabel?: string;
 };
 
 function getClientMessages(
@@ -25,11 +26,12 @@ export function ConversationList({
   messages,
   selectedClientId,
   onSelectClient,
+  emptyLabel = "No clients available.",
 }: ConversationListProps) {
   if (clients.length === 0) {
     return (
       <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-        No clients available.
+        {emptyLabel}
       </div>
     );
   }

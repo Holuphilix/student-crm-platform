@@ -16,6 +16,8 @@ import { clientsRoute } from "./routes/clients";
 import { conversationsRoute } from "./routes/conversations";
 import { dashboardRoute } from "./routes/dashboard";
 import { dealsRoute } from "./routes/deals";
+import { meRoute } from "./routes/me";
+import { usersRoute } from "./routes/users";
 
 import type { AppBindings } from "./types/env";
 
@@ -114,6 +116,10 @@ app.get("/", (c) =>
 app.route("/api/auth", authRoute);
 
 app.use("/api/*", authMiddleware);
+
+app.route("/api/me", meRoute);
+
+app.route("/api/users", usersRoute);
 
 app.route("/api/clients", clientsRoute);
 

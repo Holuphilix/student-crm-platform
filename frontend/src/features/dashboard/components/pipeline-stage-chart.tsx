@@ -8,6 +8,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { Link } from "react-router-dom";
 
 import {
   Card,
@@ -51,18 +52,23 @@ export function PipelineStageChart({
               width="100%"
               height="100%"
             >
-              <BarChart data={data}>
+              <BarChart
+                data={data}
+                layout="vertical"
+                margin={{
+                  left: 40,
+                  right: 16,
+                }}
+              >
                 <CartesianGrid
                   strokeDasharray="3 3"
-                  vertical={false}
+                  horizontal={false}
                 />
-                <XAxis
-                  dataKey="label"
-                  tickLine={false}
-                  axisLine={false}
-                  interval={0}
-                />
+                <XAxis type="number" allowDecimals={false} />
                 <YAxis
+                  type="category"
+                  dataKey="label"
+                  width={150}
                   allowDecimals={false}
                   tickLine={false}
                   axisLine={false}
@@ -70,7 +76,7 @@ export function PipelineStageChart({
                 <Tooltip />
                 <Bar
                   dataKey="count"
-                  radius={[6, 6, 0, 0]}
+                  radius={[0, 6, 6, 0]}
                   isAnimationActive={false}
                 >
                   {data.map((stage) => (
@@ -82,6 +88,17 @@ export function PipelineStageChart({
                 </Bar>
               </BarChart>
             </ResponsiveContainer>
+            <div className="mt-3 grid grid-cols-2 gap-2 text-xs">
+              {data.map((stage) => (
+                <Link
+                  key={stage.status}
+                  to={`/deals?stage=${stage.status}`}
+                  className="rounded-md px-2 py-1 text-muted-foreground transition hover:bg-muted hover:text-foreground"
+                >
+                  {stage.label}: {stage.count}
+                </Link>
+              ))}
+            </div>
           </div>
         ) : (
           <div className="flex h-72 items-center justify-center rounded-lg border border-dashed text-sm text-muted-foreground">

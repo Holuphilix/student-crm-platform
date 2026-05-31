@@ -1,7 +1,9 @@
 import { useMemo, useState } from "react";
+import { useSearchParams } from "react-router-dom";
 
 import { toast } from "sonner";
 
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
@@ -15,10 +17,23 @@ import { ConversationList } from "@/features/conversations/components/conversati
 import { ConversationThread } from "@/features/conversations/components/conversation-thread";
 import { MessageInput } from "@/features/conversations/components/message-input";
 import { useConversations } from "@/features/conversations/hooks/use-conversations";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { useUsers } from "@/features/users/hooks/use-users";
+import type { Client } from "@/features/clients/types/client.types";
+import { getFriendlyDisplayName } from "@/features/auth/utils/user-display";
 
 export function ConversationsPage() {
+  const { user, role } = useAuth();
+  const [searchParams] = useSearchParams();
+  const isAdmin = role === "admin" || role === "manager";
+  const isClient = role === "client" || role === "user";
+  const isSales = role === "sales";
+  const conversationFilter = searchParams.get("filter");
+
   const [selectedClientId, setSelectedClientId] =
     useState<string | null>(null);
+  const [isStartingConversation, setIsStartingConversation] =
+    useState(false);
 
   const {
     data: clients = [],
@@ -32,26 +47,96 @@ export function ConversationsPage() {
     isError: isMessagesError,
     createMessage,
     isCreatingMessage,
+    assignConversation,
+    isAssigningConversation,
   } = useConversations();
 
+  const { data: users = [] } = useUsers({
+    enabled: isAdmin,
+  });
+
+  const visibleMessages = useMemo(
+    () =>
+      conversationFilter === "unassigned"
+        ? messages.filter((message) => !message.assigned_to)
+        : messages,
+    [conversationFilter, messages]
+  );
+
+  const conversationClients = useMemo(() => {
+    if (!isSales && conversationFilter !== "unassigned") {
+      return clients;
+    }
+
+    const clientById = new Map<string, Client>();
+
+    for (const message of visibleMessages) {
+      const relatedClient = message.clients;
+
+      if (!relatedClient) {
+        continue;
+      }
+
+      clientById.set(message.client_id, {
+        id: message.client_id,
+        full_name:
+          relatedClient.full_name ?? "Client",
+        email: relatedClient.email ?? "",
+        phone: null,
+        company: relatedClient.company ?? null,
+        status:
+          (relatedClient.status as Client["status"]) ??
+          "new_lead",
+        owner_id: relatedClient.owner_id ?? null,
+        profile_id: relatedClient.profile_id ?? null,
+        created_at: message.created_at,
+      });
+    }
+
+    for (const client of clients) {
+      clientById.set(client.id, client);
+    }
+
+    return Array.from(clientById.values());
+  }, [clients, conversationFilter, isSales, visibleMessages]);
+
   const activeClientId =
-    selectedClientId ?? clients[0]?.id ?? null;
+    selectedClientId ?? conversationClients[0]?.id ?? null;
 
   const selectedClient = useMemo(
     () =>
       clients.find(
         (client) => client.id === activeClientId
-      ) ?? null,
-    [activeClientId, clients]
+      ) ??
+      conversationClients.find(
+        (client) => client.id === activeClientId
+      ) ??
+      null,
+    [activeClientId, clients, conversationClients]
   );
 
   const selectedMessages = useMemo(
     () =>
-      messages.filter(
+      visibleMessages.filter(
         (message) =>
           message.client_id === activeClientId
       ),
-    [activeClientId, messages]
+    [activeClientId, visibleMessages]
+  );
+
+  const selectedConversation =
+    selectedMessages[selectedMessages.length - 1] ?? null;
+  const isSelectedConversationAssignedToSales =
+    selectedConversation?.assigned_to === user?.id;
+  const isSelectedConversationUnassigned =
+    selectedConversation &&
+    !selectedConversation.assigned_to;
+  const canReply =
+    !isSales ||
+    Boolean(isSelectedConversationAssignedToSales);
+  const salesUsers = users.filter(
+    (user) =>
+      user.role === "sales" && user.status === "active"
   );
 
   const isLoading =
@@ -62,6 +147,7 @@ export function ConversationsPage() {
 
   async function handleSendMessage(message: string) {
     if (!activeClientId) {
+      toast.error("Your client profile is still being prepared.");
       return;
     }
 
@@ -69,26 +155,127 @@ export function ConversationsPage() {
       await createMessage({
         client_id: activeClientId,
         message,
-        sender: "agent",
+        sender: isClient ? "client" : "agent",
       });
+      setIsStartingConversation(false);
     } catch {
       toast.error("Failed to send message.");
     }
+  }
+
+  async function handleAssignConversation(
+    assignedTo: string
+  ) {
+    if (!selectedConversation) {
+      toast.error("Select a conversation first.");
+      return;
+    }
+
+    try {
+      await assignConversation({
+        conversationId: selectedConversation.id,
+        payload: {
+          assigned_to: assignedTo || null,
+        },
+      });
+      toast.success("Conversation assignment updated.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to assign conversation."
+      );
+    }
+  }
+
+  async function handleAssignToMe() {
+    if (!user) {
+      toast.error("You must be signed in.");
+      return;
+    }
+
+    await handleAssignConversation(user.id);
   }
 
   return (
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
-          Conversations
+          {isClient ? "My Conversations" : "Conversations"}
         </h1>
 
         <p className="mt-2 text-sm text-muted-foreground">
-          Message clients and follow live CRM updates.
+          {isClient
+            ? "Message the CRM team and follow your application updates."
+            : "Message clients and follow live CRM updates."}
         </p>
       </div>
 
-      {hasError ? (
+      {isClient ? (
+        <Card className="rounded-lg">
+          <CardHeader className="border-b">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <CardTitle>
+                  Conversation Threads
+                </CardTitle>
+                <p className="mt-1 text-sm text-muted-foreground">
+                  Start a conversation or continue your latest thread with the CRM team.
+                </p>
+              </div>
+
+              <Button
+                type="button"
+                onClick={() =>
+                  setIsStartingConversation(true)
+                }
+              >
+                Start Conversation
+              </Button>
+            </div>
+          </CardHeader>
+
+          <CardContent className="px-0">
+            {isLoading ? (
+              <div className="p-6 text-sm text-muted-foreground">
+                Loading conversations...
+              </div>
+            ) : selectedMessages.length > 0 ||
+              isStartingConversation ? (
+              <>
+                <ConversationThread
+                  client={selectedClient}
+                  messages={selectedMessages}
+                />
+
+                <MessageInput
+                  disabled={!activeClientId}
+                  isSending={isCreatingMessage}
+                  onSendMessage={handleSendMessage}
+                />
+              </>
+            ) : (
+              <div className="p-8 text-center">
+                <p className="font-medium">
+                  No conversations yet.
+                </p>
+                <p className="mx-auto mt-2 max-w-md text-sm text-muted-foreground">
+                  Start a conversation with the CRM team when you are ready to discuss your application.
+                </p>
+                <Button
+                  type="button"
+                  className="mt-4"
+                  onClick={() =>
+                    setIsStartingConversation(true)
+                  }
+                >
+                  Start Conversation
+                </Button>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      ) : hasError ? (
         <Card>
           <CardContent className="py-6">
             <p className="text-sm text-destructive">
@@ -101,7 +288,7 @@ export function ConversationsPage() {
           <Card className="rounded-lg">
             <CardHeader className="border-b">
               <CardTitle>
-                Clients
+                {isSales ? "Conversation Queue" : "Clients"}
               </CardTitle>
             </CardHeader>
 
@@ -112,10 +299,15 @@ export function ConversationsPage() {
                 </p>
               ) : (
                 <ConversationList
-                  clients={clients}
-                  messages={messages}
+                  clients={conversationClients}
+                  messages={visibleMessages}
                   selectedClientId={activeClientId}
                   onSelectClient={setSelectedClientId}
+                  emptyLabel={
+                    isSales
+                      ? "No assigned or unassigned conversations."
+                      : "No clients available."
+                  }
                 />
               )}
             </CardContent>
@@ -134,8 +326,103 @@ export function ConversationsPage() {
                     messages={selectedMessages}
                   />
 
+                  {isSales && selectedConversation ? (
+                    <div className="border-t px-4 py-3">
+                      {isSelectedConversationUnassigned ? (
+                        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                          <div>
+                            <p className="text-sm font-medium">
+                              Unassigned Conversation
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              Assign this conversation to yourself before replying.
+                            </p>
+                          </div>
+
+                          <Button
+                            type="button"
+                            disabled={
+                              isAssigningConversation
+                            }
+                            onClick={handleAssignToMe}
+                          >
+                            {isAssigningConversation
+                              ? "Assigning..."
+                              : "Assign to Me"}
+                          </Button>
+                        </div>
+                      ) : (
+                        <p className="text-sm text-muted-foreground">
+                          {isSelectedConversationAssignedToSales
+                            ? "Assigned to you. You can reply to this conversation."
+                            : "Assigned to another sales representative."}
+                        </p>
+                      )}
+                    </div>
+                  ) : null}
+
+                  {isAdmin && selectedConversation ? (
+                    <div className="border-t px-4 py-3">
+                      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+                        <div>
+                          <p className="text-sm font-medium">
+                            Assigned To
+                          </p>
+                          <p className="text-xs text-muted-foreground">
+                            Select an active sales user.
+                          </p>
+                        </div>
+
+                        <div className="flex gap-2">
+                          <select
+                            value={
+                              selectedConversation.assigned_to ??
+                              ""
+                            }
+                            disabled={isAssigningConversation}
+                            className="h-9 min-w-56 rounded-lg border border-input bg-background px-3 text-sm"
+                            onChange={(event) =>
+                              handleAssignConversation(
+                                event.target.value
+                              )
+                            }
+                          >
+                            <option value="">
+                              Unassigned
+                            </option>
+                            {salesUsers.map((user) => (
+                              <option
+                                key={user.id}
+                                value={user.id}
+                              >
+                                {getFriendlyDisplayName({
+                                  full_name: user.full_name,
+                                  email: user.email,
+                                  fallback: "Sales Representative",
+                                })}
+                              </option>
+                            ))}
+                          </select>
+
+                          <Button
+                            type="button"
+                            variant="outline"
+                            disabled={
+                              isAssigningConversation
+                            }
+                            onClick={() =>
+                              handleAssignConversation("")
+                            }
+                          >
+                            Clear
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
                   <MessageInput
-                    disabled={!activeClientId}
+                    disabled={!activeClientId || !canReply}
                     isSending={isCreatingMessage}
                     onSendMessage={handleSendMessage}
                   />

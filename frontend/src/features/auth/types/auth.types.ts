@@ -1,6 +1,7 @@
 import type { Session, User } from "@supabase/supabase-js";
 
 export const userRoles = [
+  "client",
   "user",
   "admin",
   "sales",
@@ -13,6 +14,7 @@ export type UserProfile = {
   id: string;
   full_name: string | null;
   email: string | null;
+  phone?: string | null;
   role: UserRole;
   created_at: string;
 };
@@ -47,7 +49,8 @@ export type UpdateEmailPayload = {
 };
 
 export type UpdateProfilePayload = {
-  fullName: string;
+  fullName?: string;
+  phone?: string;
 };
 
 export interface AuthContextType {

@@ -1,7 +1,10 @@
 export const clientStatuses = [
-  "lead",
-  "qualified",
-  "proposal",
+  "new_lead",
+  "contacted",
+  "consultation_booked",
+  "documents_requested",
+  "application_started",
+  "submitted",
   "won",
   "lost",
 ] as const;
@@ -11,13 +14,17 @@ export type ClientStatus =
 
 export type Client = {
   id: string;
+  profile_id?: string | null;
   owner_id?: string | null;
   full_name: string;
   email: string;
   phone: string | null;
   company: string | null;
+  country?: string | null;
+  target_country?: string | null;
   status: ClientStatus;
   created_at: string;
+  updated_at?: string | null;
 };
 
 export type CreateClientPayload = {
@@ -25,7 +32,17 @@ export type CreateClientPayload = {
   email: string;
   phone?: string;
   company?: string;
+  country?: string;
+  target_country?: string;
   status: ClientStatus;
+};
+
+export type UpdateClientPayload = {
+  full_name?: string;
+  email?: string;
+  phone?: string | null;
+  country?: string | null;
+  target_country?: string | null;
 };
 
 export type DealStage = ClientStatus;

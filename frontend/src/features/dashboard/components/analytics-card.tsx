@@ -1,4 +1,5 @@
 import type { ComponentType } from "react";
+import { Link } from "react-router-dom";
 
 import {
   Card,
@@ -15,6 +16,7 @@ type AnalyticsCardProps = {
     className?: string;
   }>;
   isLoading?: boolean;
+  to?: string;
 };
 
 export function AnalyticsCard({
@@ -22,9 +24,16 @@ export function AnalyticsCard({
   value,
   icon: Icon,
   isLoading = false,
+  to,
 }: AnalyticsCardProps) {
-  return (
-    <Card className="rounded-lg">
+  const card = (
+    <Card
+      className={
+        to && !isLoading
+          ? "rounded-lg cursor-pointer transition hover:bg-muted/40"
+          : "rounded-lg"
+      }
+    >
       <CardHeader className="flex-row items-center justify-between gap-3">
         <CardTitle className="text-sm text-muted-foreground">
           {title}
@@ -45,5 +54,18 @@ export function AnalyticsCard({
         )}
       </CardContent>
     </Card>
+  );
+
+  if (!to || isLoading) {
+    return card;
+  }
+
+  return (
+    <Link
+      to={to}
+      className="block rounded-lg transition hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+    >
+      {card}
+    </Link>
   );
 }

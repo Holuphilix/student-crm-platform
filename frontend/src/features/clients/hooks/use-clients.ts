@@ -8,10 +8,12 @@ import {
   createClient,
   getClientDetail,
   getClients,
+  updateClient,
 } from "@/features/clients/services/client.service";
 
 import type {
   CreateClientPayload,
+  UpdateClientPayload,
 } from "@/features/clients/types/client.types";
 
 export function useClients() {
@@ -40,6 +42,32 @@ export function useCreateClient() {
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: ["clients"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard-analytics"],
+      });
+    },
+  });
+}
+
+export function useUpdateClient() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({
+      clientId,
+      payload,
+    }: {
+      clientId: string;
+      payload: UpdateClientPayload;
+    }) => updateClient(clientId, payload),
+
+    onSuccess: (client) => {
+      queryClient.invalidateQueries({
+        queryKey: ["clients"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["clients", client.id],
       });
       queryClient.invalidateQueries({
         queryKey: ["dashboard-analytics"],

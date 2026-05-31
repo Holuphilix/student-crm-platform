@@ -17,6 +17,7 @@ export type Deal = {
 
 export type DealWithClient = Deal & {
   clients?: {
+    profile_id?: string | null;
     full_name: string;
     email: string;
     company: string | null;
@@ -67,6 +68,7 @@ export type CreateDealNotePayload = {
 
 export type CreateDealPayload = {
   client_id: string;
+  owner_id?: string;
   title: string;
   value_amount?: number;
   expected_intake?: string;
@@ -75,4 +77,8 @@ export type CreateDealPayload = {
 export type UpdateDealStagePayload = {
   stage: DealStage;
   lost_reason?: string;
+};
+
+export type UpdateDealOwnerPayload = {
+  owner_id: string | null;
 };

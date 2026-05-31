@@ -10,6 +10,7 @@ import {
   createScopedDealNoteSchema,
   createDealSchema,
   dealIdParamSchema,
+  updateDealOwnerSchema,
   updateDealStageSchema,
 } from "../lib/validation";
 import {
@@ -17,13 +18,17 @@ import {
   createDeal,
   getDealDetail,
   getDeals,
+  updateDealOwner,
   updateDealStage,
 } from "../services/deal.service";
 import type { AppBindings } from "../types/env";
 
 export const dealsRoute = new Hono<AppBindings>()
   .get("/", async (c) => {
-    const deals = await getDeals(c.get("supabase"));
+    const deals = await getDeals(
+      c.get("supabase"),
+      c.get("user")
+    );
 
     return successResponse(c, deals);
   })
@@ -45,7 +50,7 @@ export const dealsRoute = new Hono<AppBindings>()
       const deal = await createDeal(
         c.get("supabase"),
         payload,
-        c.get("user").id
+        c.get("user")
       );
 
       return successResponse(c, deal, 201);
@@ -68,7 +73,8 @@ export const dealsRoute = new Hono<AppBindings>()
       const { dealId } = c.req.valid("param");
       const deal = await getDealDetail(
         c.get("supabase"),
-        dealId
+        dealId,
+        c.get("user")
       );
 
       return successResponse(c, deal);
@@ -111,7 +117,8 @@ export const dealsRoute = new Hono<AppBindings>()
           deal_id: dealId,
           author_id: c.get("user").id,
           body: payload.body,
-        }
+        },
+        c.get("user")
       );
 
       return successResponse(c, note, 201);
@@ -149,7 +156,45 @@ export const dealsRoute = new Hono<AppBindings>()
         c.get("supabase"),
         dealId,
         payload,
-        c.get("user").id
+        c.get("user")
+      );
+
+      return successResponse(c, deal);
+    }
+  )
+  .patch(
+    "/:dealId/owner",
+    zValidator("param", dealIdParamSchema, (result, c) => {
+      if (!result.success) {
+        return errorResponse(
+          c,
+          "VALIDATION_ERROR",
+          "Deal id is invalid.",
+          400,
+          result.error.issues
+        );
+      }
+    }),
+    zValidator("json", updateDealOwnerSchema, (result, c) => {
+      if (!result.success) {
+        return errorResponse(
+          c,
+          "VALIDATION_ERROR",
+          "Deal owner payload is invalid.",
+          400,
+          result.error.issues
+        );
+      }
+    }),
+    async (c) => {
+      const { dealId } = c.req.valid("param");
+      const payload = c.req.valid("json");
+
+      const deal = await updateDealOwner(
+        c.get("supabase"),
+        dealId,
+        payload,
+        c.get("user")
       );
 
       return successResponse(c, deal);
@@ -176,7 +221,8 @@ export const dealsRoute = new Hono<AppBindings>()
           deal_id: payload.deal_id,
           author_id: c.get("user").id,
           body: payload.body,
-        }
+        },
+        c.get("user")
       );
 
       return successResponse(c, note, 201);

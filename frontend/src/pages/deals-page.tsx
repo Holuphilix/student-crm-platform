@@ -12,10 +12,13 @@ import {
 import { Input } from "@/components/ui/input";
 
 import { useClients } from "@/features/clients/hooks/use-clients";
+import { useAuth } from "@/features/auth/hooks/use-auth";
 import { PipelineBoard } from "@/features/deals/components/pipeline-board";
 import { useCreateDeal } from "@/features/deals/hooks/use-deals";
 
 export function DealsPage() {
+  const { role } = useAuth();
+  const isClient = role === "client" || role === "user";
   const { data: clients = [] } = useClients();
   const createDealMutation = useCreateDeal();
 
@@ -61,8 +64,12 @@ export function DealsPage() {
       setTitle("");
       setValueAmount("");
       setExpectedIntake("");
-    } catch {
-      toast.error("Failed to create deal.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to create deal."
+      );
     }
   }
 
@@ -70,15 +77,18 @@ export function DealsPage() {
     <div className="space-y-6">
       <div>
         <h1 className="text-3xl font-bold">
-          Deal Pipeline
+          {isClient ? "My Deals" : "Deal Pipeline"}
         </h1>
 
         <p className="mt-2 text-sm text-muted-foreground">
-          Track clients across each pipeline stage.
+          {isClient
+            ? "Track the high-level status of your active applications."
+            : "Track clients across each pipeline stage."}
         </p>
       </div>
 
-      <Card>
+      {!isClient ? (
+        <Card>
         <CardHeader>
           <CardTitle>
             Create Deal
@@ -151,7 +161,8 @@ export function DealsPage() {
             </div>
           </form>
         </CardContent>
-      </Card>
+        </Card>
+      ) : null}
 
       <PipelineBoard />
     </div>

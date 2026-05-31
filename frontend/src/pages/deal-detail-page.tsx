@@ -20,6 +20,10 @@ import {
   useCreateDealNote,
   useDealDetail,
 } from "@/features/deals/hooks/use-deal-notes";
+import { useAuth } from "@/features/auth/hooks/use-auth";
+import { getFriendlyDisplayName } from "@/features/auth/utils/user-display";
+import { useUpdateDealOwner } from "@/features/deals/hooks/use-deals";
+import { useUsers } from "@/features/users/hooks/use-users";
 
 const currencyFormatter = new Intl.NumberFormat(
   undefined,
@@ -31,6 +35,8 @@ const currencyFormatter = new Intl.NumberFormat(
 );
 
 export function DealDetailPage() {
+  const { role } = useAuth();
+  const isAdmin = role === "admin" || role === "manager";
   const { dealId } = useParams<{
     dealId: string;
   }>();
@@ -42,6 +48,14 @@ export function DealDetailPage() {
   } = useDealDetail(dealId);
 
   const createNoteMutation = useCreateDealNote(dealId);
+  const updateOwnerMutation = useUpdateDealOwner();
+  const { data: users = [] } = useUsers({
+    enabled: isAdmin,
+  });
+  const salesUsers = users.filter(
+    (user) =>
+      user.role === "sales" && user.status === "active"
+  );
 
   async function handleSubmitNote(body: string) {
     if (!dealId) {
@@ -56,6 +70,28 @@ export function DealDetailPage() {
       toast.success("Note added.");
     } catch {
       toast.error("Failed to add note.");
+    }
+  }
+
+  async function handleOwnerChange(ownerId: string) {
+    if (!dealId) {
+      return;
+    }
+
+    try {
+      await updateOwnerMutation.mutateAsync({
+        dealId,
+        payload: {
+          owner_id: ownerId || null,
+        },
+      });
+      toast.success("Deal owner updated.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to update deal owner."
+      );
     }
   }
 
@@ -167,6 +203,36 @@ export function DealDetailPage() {
                     "No company"}
                 </p>
               </div>
+
+              {isAdmin ? (
+                <div className="sm:col-span-3">
+                  <p className="text-xs font-medium text-muted-foreground">
+                    Owner
+                  </p>
+                  <select
+                    value={dealDetail.deal.owner_id ?? ""}
+                    disabled={updateOwnerMutation.isPending}
+                    className="mt-1 h-9 w-full rounded-lg border border-input bg-background px-3 text-sm sm:max-w-sm"
+                    onChange={(event) =>
+                      handleOwnerChange(event.target.value)
+                    }
+                  >
+                    <option value="">Unassigned</option>
+                    {salesUsers.map((user) => (
+                      <option
+                        key={user.id}
+                        value={user.id}
+                      >
+                        {getFriendlyDisplayName({
+                          full_name: user.full_name,
+                          email: user.email,
+                          fallback: "Sales Representative",
+                        })}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              ) : null}
             </CardContent>
           </Card>
 

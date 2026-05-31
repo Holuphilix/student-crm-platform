@@ -5,12 +5,14 @@ import {
 } from "@tanstack/react-query";
 
 import {
+  assignConversation,
   createConversationMessage,
   getConversationMessages,
 } from "@/features/conversations/services/conversation.service";
 
 import type {
   ConversationMessage,
+  AssignConversationPayload,
   CreateConversationMessagePayload,
 } from "@/features/conversations/types/conversation.types";
 
@@ -70,9 +72,35 @@ export function useConversations() {
     },
   });
 
+  const assignConversationMutation = useMutation({
+    mutationFn: ({
+      conversationId,
+      payload,
+    }: {
+      conversationId: string;
+      payload: AssignConversationPayload;
+    }) => assignConversation(conversationId, payload),
+
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: conversationsQueryKey,
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["dashboard-analytics"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ["users", "sales-stats"],
+      });
+    },
+  });
+
   return {
     ...query,
     createMessage: createMessageMutation.mutateAsync,
     isCreatingMessage: createMessageMutation.isPending,
+    assignConversation:
+      assignConversationMutation.mutateAsync,
+    isAssigningConversation:
+      assignConversationMutation.isPending,
   };
 }

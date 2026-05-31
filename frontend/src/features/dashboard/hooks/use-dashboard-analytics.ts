@@ -11,15 +11,19 @@ import {
   clientStatuses,
   type ClientStatus,
 } from "@/features/clients/types/client.types";
+import { normalizeStage } from "@/features/deals/utils/stage-format";
 
 const dashboardAnalyticsQueryKey = [
   "dashboard-analytics",
 ];
 
 const pipelineStageColors: Record<ClientStatus, string> = {
-  lead: "#2563eb",
-  qualified: "#0891b2",
-  proposal: "#ca8a04",
+  new_lead: "#2563eb",
+  contacted: "#0891b2",
+  consultation_booked: "#7c3aed",
+  documents_requested: "#ca8a04",
+  application_started: "#ea580c",
+  submitted: "#0f766e",
   won: "#16a34a",
   lost: "#dc2626",
 };
@@ -46,7 +50,7 @@ function normalizePipelineStages(
       )
     ) {
       countByStatus.set(
-        stage.status as ClientStatus,
+        normalizeStage(stage.status),
         stage.count
       );
     }

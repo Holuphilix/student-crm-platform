@@ -148,7 +148,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
                 ? nextUser.user_metadata.full_name
                 : undefined,
             email: nextUser.email,
-            role: "user",
+            role: "client",
           }));
 
         if (!isMounted) {

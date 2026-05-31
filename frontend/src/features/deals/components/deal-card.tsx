@@ -16,11 +16,16 @@ import {
 import type {
   ClientStatus,
 } from "@/features/clients/types/client.types";
+import { clientStatuses } from "@/features/clients/types/client.types";
 import { useUpdateDealStage } from "@/features/deals/hooks/use-deals";
 import type {
   DealStage,
   DealWithClient,
 } from "@/features/deals/types/deal.types";
+import {
+  formatStageLabel,
+  normalizeStage,
+} from "@/features/deals/utils/stage-format";
 
 type DealCardProps = {
   deal: DealWithClient;
@@ -30,20 +35,17 @@ const statusBadgeVariant: Record<
   ClientStatus,
   ComponentProps<typeof Badge>["variant"]
 > = {
-  lead: "secondary",
-  qualified: "outline",
-  proposal: "default",
+  new_lead: "secondary",
+  contacted: "outline",
+  consultation_booked: "default",
+  documents_requested: "outline",
+  application_started: "default",
+  submitted: "secondary",
   won: "default",
   lost: "destructive",
 };
 
-const dealStages: DealStage[] = [
-  "lead",
-  "qualified",
-  "proposal",
-  "won",
-  "lost",
-];
+const dealStages: DealStage[] = [...clientStatuses];
 
 const currencyFormatter = new Intl.NumberFormat(
   undefined,
@@ -56,6 +58,7 @@ const currencyFormatter = new Intl.NumberFormat(
 
 export function DealCard({ deal }: DealCardProps) {
   const updateStageMutation = useUpdateDealStage();
+  const normalizedStage = normalizeStage(deal.stage);
 
   async function handleStageChange(stage: DealStage) {
     try {
@@ -65,8 +68,12 @@ export function DealCard({ deal }: DealCardProps) {
           stage,
         },
       });
-    } catch {
-      toast.error("Failed to update deal stage.");
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to update deal stage."
+      );
     }
   }
 
@@ -82,10 +89,10 @@ export function DealCard({ deal }: DealCardProps) {
           </CardTitle>
 
           <Badge
-            variant={statusBadgeVariant[deal.stage]}
+            variant={statusBadgeVariant[normalizedStage]}
             className="capitalize"
           >
-            {deal.stage}
+            {formatStageLabel(normalizedStage)}
           </Badge>
         </div>
       </CardHeader>
@@ -107,7 +114,7 @@ export function DealCard({ deal }: DealCardProps) {
 
         <div className="pt-2">
           <select
-            value={deal.stage}
+            value={normalizedStage}
             disabled={updateStageMutation.isPending}
             className="h-8 w-full rounded-lg border border-input bg-background px-2 text-sm"
             onChange={(event) =>
@@ -118,7 +125,7 @@ export function DealCard({ deal }: DealCardProps) {
           >
             {dealStages.map((stage) => (
               <option key={stage} value={stage}>
-                {stage}
+                {formatStageLabel(stage)}
               </option>
             ))}
           </select>

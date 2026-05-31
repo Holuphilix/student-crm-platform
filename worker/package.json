@@ -10,6 +10,9 @@
     "deploy:root-config": "wrangler deploy --config ../wrangler.jsonc",
     "deploy:dry-run": "wrangler deploy --dry-run",
     "deploy:root-dry-run": "wrangler deploy --dry-run --config ../wrangler.jsonc",
+    "seed:demo-users": "node scripts/seed-demo-users.mjs",
+    "verify:demo-users": "node scripts/verify-demo-users.mjs",
+    "verify:schema": "node scripts/verify-crm-schema.mjs",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
