@@ -1,4 +1,5 @@
-import { Badge } from "@/components/ui/badge";
+import { AvatarInitials } from "@/components/common/avatar-initials";
+import { StatusBadge } from "@/components/common/status-badge";
 import {
   Card,
   CardContent,
@@ -26,7 +27,12 @@ export function ClientProfileCard({
     <Card className="rounded-lg">
       <CardHeader>
         <div className="flex flex-wrap items-start justify-between gap-3">
-          <div className="min-w-0">
+          <div className="flex min-w-0 items-center gap-3">
+            <AvatarInitials
+              name={client.full_name}
+              email={client.email}
+            />
+            <div className="min-w-0">
             <CardTitle className="truncate text-xl">
               {client.full_name}
             </CardTitle>
@@ -34,11 +40,10 @@ export function ClientProfileCard({
             <p className="mt-1 truncate text-sm text-muted-foreground">
               {client.email}
             </p>
+            </div>
           </div>
 
-          <Badge className="capitalize">
-            {client.status}
-          </Badge>
+          <StatusBadge status={client.status} />
         </div>
       </CardHeader>
 

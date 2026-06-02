@@ -28,7 +28,7 @@ export function DealNotesCard({
       <CardHeader>
         <div className="flex items-center justify-between gap-3">
           <CardTitle>
-            Notes
+            Internal Notes
           </CardTitle>
 
           <Badge variant="secondary">
@@ -59,7 +59,7 @@ export function DealNotesCard({
           </div>
         ) : (
           <div className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            No notes recorded for this deal.
+            No internal notes recorded for this deal.
           </div>
         )}
       </CardContent>

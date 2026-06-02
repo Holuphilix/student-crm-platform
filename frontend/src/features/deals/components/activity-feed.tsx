@@ -18,6 +18,7 @@ import type {
 
 type ActivityFeedProps = {
   activities: DealActivityItem[];
+  title?: string;
 };
 
 const activityDateFormatter = new Intl.DateTimeFormat(
@@ -39,12 +40,13 @@ const activityIconByType: Record<
 
 export function ActivityFeed({
   activities,
+  title = "Activity Feed",
 }: ActivityFeedProps) {
   return (
     <Card className="rounded-lg">
       <CardHeader>
         <CardTitle>
-          Activity Feed
+          {title}
         </CardTitle>
       </CardHeader>
 

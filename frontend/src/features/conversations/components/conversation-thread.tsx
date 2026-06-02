@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
-import { Badge } from "@/components/ui/badge";
+import { AvatarInitials } from "@/components/common/avatar-initials";
+import { StatusBadge } from "@/components/common/status-badge";
 
 import type { Client } from "@/features/clients/types/client.types";
 import type { ConversationMessage } from "@/features/conversations/types/conversation.types";
@@ -8,6 +9,7 @@ import type { ConversationMessage } from "@/features/conversations/types/convers
 type ConversationThreadProps = {
   client: Client | null;
   messages: ConversationMessage[];
+  currentUserId?: string | null;
 };
 
 const messageTimeFormatter = new Intl.DateTimeFormat(
@@ -21,6 +23,7 @@ const messageTimeFormatter = new Intl.DateTimeFormat(
 export function ConversationThread({
   client,
   messages,
+  currentUserId,
 }: ConversationThreadProps) {
   const endOfThreadRef = useRef<HTMLDivElement | null>(
     null
@@ -54,30 +57,39 @@ export function ConversationThread({
             </p>
           </div>
 
-          <Badge className="capitalize">
-            {client.status}
-          </Badge>
+          <StatusBadge status={client.status} />
         </div>
       </div>
 
       <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
         {messages.length > 0 ? (
           messages.map((message) => {
-            const isAgentMessage =
-              message.sender === "agent";
+            const isOwnMessage =
+              Boolean(currentUserId) &&
+              message.author_id === currentUserId;
+            const roleLabel =
+              message.sender === "agent"
+                ? "CRM Team"
+                : "Client";
 
             return (
               <div
                 key={message.id}
-                className={`flex ${
-                  isAgentMessage
+                className={`flex items-end gap-2 ${
+                  isOwnMessage
                     ? "justify-end"
                     : "justify-start"
                 }`}
               >
+                {!isOwnMessage ? (
+                  <AvatarInitials
+                    name={roleLabel}
+                    className="size-8"
+                  />
+                ) : null}
                 <div
                   className={`max-w-[85%] rounded-lg px-3 py-2 text-sm md:max-w-[70%] ${
-                    isAgentMessage
+                    isOwnMessage
                       ? "bg-primary text-primary-foreground"
                       : "bg-muted text-foreground"
                   }`}
@@ -88,17 +100,23 @@ export function ConversationThread({
 
                   <p
                     className={`mt-1 text-xs ${
-                      isAgentMessage
+                      isOwnMessage
                         ? "text-primary-foreground/70"
                         : "text-muted-foreground"
                     }`}
                   >
-                    {message.sender} -{" "}
+                    {isOwnMessage ? "You" : roleLabel} -{" "}
                     {messageTimeFormatter.format(
                       new Date(message.created_at)
                     )}
                   </p>
                 </div>
+                {isOwnMessage ? (
+                  <AvatarInitials
+                    name="You"
+                    className="size-8 bg-primary text-primary-foreground"
+                  />
+                ) : null}
               </div>
             );
           })

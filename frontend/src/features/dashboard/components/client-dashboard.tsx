@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -13,6 +12,8 @@ import { useClients } from "@/features/clients/hooks/use-clients";
 import { useConversations } from "@/features/conversations/hooks/use-conversations";
 import { useDeals } from "@/features/deals/hooks/use-deals";
 import { normalizeStage } from "@/features/deals/utils/stage-format";
+import { ApplicationProgress } from "@/features/deals/components/application-progress";
+import { StatusBadge } from "@/components/common/status-badge";
 
 export function ClientDashboard() {
   const {
@@ -112,12 +113,10 @@ export function ClientDashboard() {
                 <p className="truncate text-lg font-semibold">
                   {activeDeal.title}
                 </p>
-                <Badge className="mt-2 capitalize">
-                  {normalizeStage(activeDeal.stage).replaceAll(
-                    "_",
-                    " "
-                  )}
-                </Badge>
+                <StatusBadge
+                  status={normalizeStage(activeDeal.stage)}
+                  className="mt-2"
+                />
               </>
             ) : (
               <p className="text-sm text-muted-foreground">
@@ -183,6 +182,19 @@ export function ClientDashboard() {
           </CardContent>
         </Card>
       </div>
+
+      {activeDeal ? (
+        <Card className="rounded-lg">
+          <CardHeader>
+            <CardTitle>Application Progress</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ApplicationProgress
+              currentStage={normalizeStage(activeDeal.stage)}
+            />
+          </CardContent>
+        </Card>
+      ) : null}
     </div>
   );
 }

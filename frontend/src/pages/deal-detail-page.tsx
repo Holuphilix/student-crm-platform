@@ -3,7 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
+import { StatusBadge } from "@/components/common/status-badge";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -24,6 +24,8 @@ import { useAuth } from "@/features/auth/hooks/use-auth";
 import { getFriendlyDisplayName } from "@/features/auth/utils/user-display";
 import { useUpdateDealOwner } from "@/features/deals/hooks/use-deals";
 import { useUsers } from "@/features/users/hooks/use-users";
+import { ApplicationProgress } from "@/features/deals/components/application-progress";
+import { normalizeStage } from "@/features/deals/utils/stage-format";
 
 const currencyFormatter = new Intl.NumberFormat(
   undefined,
@@ -37,6 +39,7 @@ const currencyFormatter = new Intl.NumberFormat(
 export function DealDetailPage() {
   const { role } = useAuth();
   const isAdmin = role === "admin" || role === "manager";
+  const isClient = role === "client" || role === "user";
   const { dealId } = useParams<{
     dealId: string;
   }>();
@@ -123,11 +126,13 @@ export function DealDetailPage() {
 
         <div>
           <h1 className="text-3xl font-bold">
-            Deal Workspace
+            {isClient ? "Application Details" : "Deal Workspace"}
           </h1>
 
           <p className="mt-2 text-sm text-muted-foreground">
-            Manage notes, activity, and relationship progress.
+            {isClient
+              ? "Review your current application stage and latest updates."
+              : "Manage notes, activity, and relationship progress."}
           </p>
         </div>
       </div>
@@ -164,13 +169,51 @@ export function DealDetailPage() {
                   </p>
                 </div>
 
-                <Badge className="capitalize">
-                  {dealDetail.deal.stage}
-                </Badge>
+                <StatusBadge
+                  status={normalizeStage(dealDetail.deal.stage)}
+                />
               </div>
             </CardHeader>
 
             <CardContent className="grid gap-4 sm:grid-cols-3">
+              {isClient ? (
+                <>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Status
+                    </p>
+                    <p className="mt-1 text-sm">
+                      {normalizeStage(dealDetail.deal.stage) === "won"
+                        ? "Completed successfully"
+                        : normalizeStage(dealDetail.deal.stage) === "lost"
+                          ? "Closed"
+                          : "In progress"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Assigned Consultant
+                    </p>
+                    <p className="mt-1 text-sm">
+                      {dealDetail.deal.owner_id
+                        ? "Education consultant assigned"
+                        : "Assignment pending"}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs font-medium text-muted-foreground">
+                      Last Update
+                    </p>
+                    <p className="mt-1 text-sm">
+                      {new Date(
+                        dealDetail.deal.updated_at ??
+                          dealDetail.deal.created_at
+                      ).toLocaleDateString()}
+                    </p>
+                  </div>
+                </>
+              ) : (
+                <>
               <div>
                 <p className="text-xs font-medium text-muted-foreground">
                   Value
@@ -203,6 +246,8 @@ export function DealDetailPage() {
                     "No company"}
                 </p>
               </div>
+                </>
+              )}
 
               {isAdmin ? (
                 <div className="sm:col-span-3">
@@ -236,11 +281,33 @@ export function DealDetailPage() {
             </CardContent>
           </Card>
 
+          {isClient ? (
+            <Card className="rounded-lg">
+              <CardHeader>
+                <CardTitle>Application Progress</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <ApplicationProgress
+                  currentStage={normalizeStage(dealDetail.deal.stage)}
+                />
+                <p className="text-sm text-muted-foreground">
+                  {dealDetail.deal.owner_id
+                    ? "An education consultant is assigned to your application."
+                    : "Your education consultant assignment is being prepared."}
+                </p>
+              </CardContent>
+            </Card>
+          ) : null}
+
+          {!isClient ? (
           <Card className="rounded-lg">
             <CardHeader>
               <CardTitle>
-                Add Note
+                Add Internal Note
               </CardTitle>
+              <p className="text-sm text-muted-foreground">
+                Internal CRM notes are visible only to the sales team and managers.
+              </p>
             </CardHeader>
 
             <CardContent>
@@ -252,12 +319,16 @@ export function DealDetailPage() {
               />
             </CardContent>
           </Card>
+          ) : null}
 
           <div className="grid gap-4 xl:grid-cols-2">
-            <DealNotesCard notes={dealDetail.notes} />
+            {!isClient ? (
+              <DealNotesCard notes={dealDetail.notes} />
+            ) : null}
 
             <ActivityFeed
               activities={dealDetail.activityFeed}
+              title={isClient ? "Application Updates" : "Activity Feed"}
             />
           </div>
         </div>

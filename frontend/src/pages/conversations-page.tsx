@@ -4,6 +4,8 @@ import { useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { PageHeader } from "@/components/common/page-header";
+import { Input } from "@/components/ui/input";
 import {
   Card,
   CardContent,
@@ -34,6 +36,7 @@ export function ConversationsPage() {
     useState<string | null>(null);
   const [isStartingConversation, setIsStartingConversation] =
     useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
 
   const {
     data: clients = [],
@@ -100,8 +103,22 @@ export function ConversationsPage() {
     return Array.from(clientById.values());
   }, [clients, conversationFilter, isSales, visibleMessages]);
 
+  const filteredConversationClients = useMemo(() => {
+    const query = searchQuery.trim().toLowerCase();
+
+    if (!query) {
+      return conversationClients;
+    }
+
+    return conversationClients.filter((client) =>
+      [client.full_name, client.email, client.company]
+        .filter(Boolean)
+        .some((value) => value?.toLowerCase().includes(query))
+    );
+  }, [conversationClients, searchQuery]);
+
   const activeClientId =
-    selectedClientId ?? conversationClients[0]?.id ?? null;
+    selectedClientId ?? filteredConversationClients[0]?.id ?? null;
 
   const selectedClient = useMemo(
     () =>
@@ -199,17 +216,14 @@ export function ConversationsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">
-          {isClient ? "My Conversations" : "Conversations"}
-        </h1>
-
-        <p className="mt-2 text-sm text-muted-foreground">
-          {isClient
+      <PageHeader
+        title={isClient ? "My Conversations" : "Conversations"}
+        description={
+          isClient
             ? "Message the CRM team and follow your application updates."
-            : "Message clients and follow live CRM updates."}
-        </p>
-      </div>
+            : "Message clients and follow live CRM updates."
+        }
+      />
 
       {isClient ? (
         <Card className="rounded-lg">
@@ -246,6 +260,7 @@ export function ConversationsPage() {
                 <ConversationThread
                   client={selectedClient}
                   messages={selectedMessages}
+                  currentUserId={user?.id}
                 />
 
                 <MessageInput
@@ -287,9 +302,17 @@ export function ConversationsPage() {
         <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
           <Card className="rounded-lg">
             <CardHeader className="border-b">
-              <CardTitle>
-                {isSales ? "Conversation Queue" : "Clients"}
-              </CardTitle>
+              <div className="space-y-3">
+                <CardTitle>
+                  {isSales ? "Conversation Queue" : "Clients"}
+                </CardTitle>
+                <Input
+                  value={searchQuery}
+                  placeholder="Search conversations..."
+                  aria-label="Search conversations"
+                  onChange={(event) => setSearchQuery(event.target.value)}
+                />
+              </div>
             </CardHeader>
 
             <CardContent className="max-h-[72vh] overflow-y-auto">
@@ -299,7 +322,7 @@ export function ConversationsPage() {
                 </p>
               ) : (
                 <ConversationList
-                  clients={conversationClients}
+                  clients={filteredConversationClients}
                   messages={visibleMessages}
                   selectedClientId={activeClientId}
                   onSelectClient={setSelectedClientId}
@@ -324,6 +347,7 @@ export function ConversationsPage() {
                   <ConversationThread
                     client={selectedClient}
                     messages={selectedMessages}
+                    currentUserId={user?.id}
                   />
 
                   {isSales && selectedConversation ? (

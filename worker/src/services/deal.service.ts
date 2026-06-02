@@ -14,6 +14,7 @@ import {
   isCheckConstraintError,
   isStageCompatibilityError,
   isMissingColumnError,
+  toCurrentStage,
   toLegacyStage,
 } from "../lib/legacy-stage";
 import type { AuthenticatedUser } from "../types/env";
@@ -245,9 +246,15 @@ export async function getDealDetail(
   const notes = isClientRole(actor.role)
     ? []
     : ((notesResponse.data ?? []) as DealNote[]);
-  const stageHistory =
-    (historyResponse.data ??
-      []) as DealStageHistory[];
+  const stageHistory = (
+    (historyResponse.data ?? []) as DealStageHistory[]
+  ).map((history) => ({
+    ...history,
+    from_stage: history.from_stage
+      ? toCurrentStage(history.from_stage)
+      : null,
+    to_stage: toCurrentStage(history.to_stage),
+  }));
 
   return {
     deal: resolvedDeal,

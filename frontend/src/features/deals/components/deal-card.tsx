@@ -1,10 +1,15 @@
-import type { ComponentProps } from "react";
 import { Link } from "react-router-dom";
+import {
+  Banknote,
+  BriefcaseBusiness,
+  CalendarClock,
+  UserRound,
+} from "lucide-react";
 
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { StatusBadge } from "@/components/common/status-badge";
 
 import {
   Card,
@@ -13,9 +18,6 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import type {
-  ClientStatus,
-} from "@/features/clients/types/client.types";
 import { clientStatuses } from "@/features/clients/types/client.types";
 import { useUpdateDealStage } from "@/features/deals/hooks/use-deals";
 import type {
@@ -29,20 +31,6 @@ import {
 
 type DealCardProps = {
   deal: DealWithClient;
-};
-
-const statusBadgeVariant: Record<
-  ClientStatus,
-  ComponentProps<typeof Badge>["variant"]
-> = {
-  new_lead: "secondary",
-  contacted: "outline",
-  consultation_booked: "default",
-  documents_requested: "outline",
-  application_started: "default",
-  submitted: "secondary",
-  won: "default",
-  lost: "destructive",
 };
 
 const dealStages: DealStage[] = [...clientStatuses];
@@ -59,6 +47,7 @@ const currencyFormatter = new Intl.NumberFormat(
 export function DealCard({ deal }: DealCardProps) {
   const updateStageMutation = useUpdateDealStage();
   const normalizedStage = normalizeStage(deal.stage);
+  const updatedAt = deal.updated_at ?? deal.created_at;
 
   async function handleStageChange(stage: DealStage) {
     try {
@@ -88,28 +77,28 @@ export function DealCard({ deal }: DealCardProps) {
             {deal.title}
           </CardTitle>
 
-          <Badge
-            variant={statusBadgeVariant[normalizedStage]}
-            className="capitalize"
-          >
-            {formatStageLabel(normalizedStage)}
-          </Badge>
+          <StatusBadge status={normalizedStage} />
         </div>
       </CardHeader>
 
-      <CardContent className="space-y-1 text-sm">
-        <p className="truncate text-muted-foreground">
+      <CardContent className="space-y-2 text-sm">
+        <p className="flex items-center gap-2 truncate text-muted-foreground">
+          <UserRound className="size-4 shrink-0" />
           {deal.clients?.full_name ?? "No client linked"}
         </p>
-
-        <p className="truncate font-medium">
-          {deal.clients?.company || "No company"}
+        <p className="flex items-center gap-2 truncate text-muted-foreground">
+          <BriefcaseBusiness className="size-4 shrink-0" />
+          {deal.clients?.company || "No company provided"}
         </p>
-
-        <p className="text-muted-foreground">
+        <p className="flex items-center gap-2 text-muted-foreground">
+          <Banknote className="size-4 shrink-0" />
           {deal.value_amount
             ? currencyFormatter.format(deal.value_amount)
-            : "No value set"}
+            : "Value not set"}
+        </p>
+        <p className="flex items-center gap-2 text-xs text-muted-foreground">
+          <CalendarClock className="size-4 shrink-0" />
+          Updated {new Date(updatedAt).toLocaleDateString()}
         </p>
 
         <div className="pt-2">

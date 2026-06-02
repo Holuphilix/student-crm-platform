@@ -3,7 +3,9 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
+import { AvatarInitials } from "@/components/common/avatar-initials";
+import { PageHeader } from "@/components/common/page-header";
+import { StatusBadge } from "@/components/common/status-badge";
 
 import { Button } from "@/components/ui/button";
 
@@ -42,6 +44,17 @@ export function ClientsPage() {
   const [phone, setPhone] = useState("");
 
   const [company, setCompany] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const filteredClients = (clients ?? []).filter((client) => {
+    const query = searchQuery.trim().toLowerCase();
+
+    return (
+      !query ||
+      [client.full_name, client.email, client.phone, client.company]
+        .filter(Boolean)
+        .some((value) => value?.toLowerCase().includes(query))
+    );
+  });
 
   async function handleCreateClient(
     event: React.FormEvent<HTMLFormElement>
@@ -73,7 +86,7 @@ export function ClientsPage() {
       setEmail("");
       setPhone("");
       setCompany("");
-    } catch (error) {
+    } catch {
       toast.error(
         "Failed to create client."
       );
@@ -82,15 +95,10 @@ export function ClientsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">
-          Clients
-        </h1>
-
-        <p className="mt-2 text-sm text-muted-foreground">
-          Manage and organize CRM client relationships.
-        </p>
-      </div>
+      <PageHeader
+        title="Clients"
+        description="Manage and organize CRM client relationships."
+      />
 
       <Card>
         <CardHeader>
@@ -153,16 +161,25 @@ export function ClientsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>
-            Clients
-          </CardTitle>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <CardTitle>Client Directory</CardTitle>
+            <Input
+              value={searchQuery}
+              placeholder="Search clients..."
+              aria-label="Search clients"
+              className="sm:max-w-xs"
+              onChange={(event) => setSearchQuery(event.target.value)}
+            />
+          </div>
         </CardHeader>
 
         <CardContent>
           {isLoading ? (
             <p>Loading clients...</p>
-          ) : clients?.length === 0 ? (
-            <p>No clients found.</p>
+          ) : filteredClients.length === 0 ? (
+            <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
+              No clients match your current search.
+            </p>
           ) : (
             <Table>
               <TableHeader>
@@ -194,10 +211,17 @@ export function ClientsPage() {
               </TableHeader>
 
               <TableBody>
-                {clients?.map((client) => (
+                {filteredClients.map((client) => (
                   <TableRow key={client.id}>
                     <TableCell>
-                      {client.full_name}
+                      <div className="flex items-center gap-2">
+                        <AvatarInitials
+                          name={client.full_name}
+                          email={client.email}
+                          className="size-8"
+                        />
+                        {client.full_name}
+                      </div>
                     </TableCell>
 
                     <TableCell>
@@ -213,9 +237,7 @@ export function ClientsPage() {
                     </TableCell>
 
                     <TableCell>
-                      <Badge>
-                        {client.status}
-                      </Badge>
+                      <StatusBadge status={client.status} />
                     </TableCell>
 
                     <TableCell>

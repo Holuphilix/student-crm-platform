@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
+import { AvatarInitials } from "@/components/common/avatar-initials";
 
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import {
@@ -61,6 +62,10 @@ export function AppHeader() {
         </div>
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+          <AvatarInitials
+            name={displayName}
+            email={displayEmail}
+          />
           <div className="text-left sm:text-right">
             <p className="text-sm font-bold text-foreground">
               {displayName}

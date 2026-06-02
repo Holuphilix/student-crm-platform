@@ -22,7 +22,6 @@ type PipelineColumnProps = {
 
 export function PipelineColumn({
   title,
-  status,
   deals,
 }: PipelineColumnProps) {
   return (
@@ -49,7 +48,7 @@ export function PipelineColumn({
           ))
         ) : (
           <p className="rounded-lg border border-dashed bg-background/60 px-3 py-6 text-center text-sm text-muted-foreground">
-            No {status} deals
+            No active deals at this stage.
           </p>
         )}
       </CardContent>

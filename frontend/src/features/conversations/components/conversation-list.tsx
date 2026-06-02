@@ -1,5 +1,7 @@
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { AvatarInitials } from "@/components/common/avatar-initials";
+import { StatusBadge } from "@/components/common/status-badge";
 
 import type { Client } from "@/features/clients/types/client.types";
 import type { ConversationMessage } from "@/features/conversations/types/conversation.types";
@@ -58,6 +60,11 @@ export function ConversationList({
             className="h-auto w-full justify-start px-3 py-3 text-left"
             onClick={() => onSelectClient(client.id)}
           >
+            <AvatarInitials
+              name={client.full_name}
+              email={client.email}
+              className="mr-3"
+            />
             <div className="min-w-0 flex-1 space-y-1">
               <div className="flex items-center justify-between gap-3">
                 <span className="truncate font-medium">
@@ -74,6 +81,17 @@ export function ConversationList({
                   client.company ||
                   client.email}
               </p>
+              <div className="flex items-center justify-between gap-2">
+                <StatusBadge
+                  status={latestMessage?.status ?? "open"}
+                  className="text-[10px]"
+                />
+                {latestMessage ? (
+                  <span className="text-[10px] text-muted-foreground">
+                    {new Date(latestMessage.created_at).toLocaleDateString()}
+                  </span>
+                ) : null}
+              </div>
             </div>
           </Button>
         );

@@ -63,6 +63,41 @@ async function refreshAccessToken() {
   return session?.access_token ?? null;
 }
 
+async function parseApiResponse<T>(
+  response: Response
+): Promise<T> {
+  const result = await response.json();
+
+  if (!response.ok) {
+    throw new Error(
+      result?.error?.message ??
+        "API request failed."
+    );
+  }
+
+  return result.data;
+}
+
+export async function publicApiClient<T>(
+  endpoint: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const response = await fetch(
+    `${API_BASE_URL}${endpoint}`,
+    {
+      ...options,
+
+      headers: {
+        "Content-Type": "application/json",
+
+        ...options.headers,
+      },
+    }
+  );
+
+  return parseApiResponse<T>(response);
+}
+
 export async function apiClient<T>(
   endpoint: string,
   options: RequestInit = {}
@@ -83,14 +118,5 @@ export async function apiClient<T>(
     );
   }
 
-  const result = await response.json();
-
-  if (!response.ok) {
-    throw new Error(
-      result?.error?.message ??
-        "API request failed."
-    );
-  }
-
-  return result.data;
+  return parseApiResponse<T>(response);
 }

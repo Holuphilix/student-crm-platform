@@ -9,6 +9,7 @@ import type {
   CreateClientPayload,
   UpdateClientPayload,
 } from "@/features/clients/types/client.types";
+import { formatStageLabel } from "@/features/deals/utils/stage-format";
 
 export async function getClients(): Promise<Client[]> {
   return apiClient<Client[]>("/api/clients");
@@ -125,7 +126,11 @@ function buildClientActivityTimeline(
       id: `deal-stage-${history.id}`,
       type: "deal_stage_changed" as const,
       title: "Deal stage changed",
-      description: `${dealTitleById.get(history.deal_id) ?? "Deal"} moved from ${history.from_stage ?? "none"} to ${history.to_stage}.`,
+      description: `${dealTitleById.get(history.deal_id) ?? "Deal"} moved from ${
+        history.from_stage
+          ? formatStageLabel(history.from_stage)
+          : "none"
+      } to ${formatStageLabel(history.to_stage)}.`,
       created_at: history.created_at,
       metadata: {
         deal_id: history.deal_id,

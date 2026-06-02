@@ -1,7 +1,9 @@
 import { useMemo } from "react";
+import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
 
 import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import {
@@ -61,6 +63,7 @@ export function PipelineBoard() {
   const viewFilter = searchParams.get("filter");
   const ownerIdFilter = searchParams.get("ownerId");
   const ownerFilter = searchParams.get("owner");
+  const [searchQuery, setSearchQuery] = useState("");
   const {
     data: deals = [],
     isLoading,
@@ -92,9 +95,16 @@ export function PipelineBoard() {
           return false;
         }
 
-        return true;
+        const query = searchQuery.trim().toLowerCase();
+
+        return (
+          !query ||
+          [deal.title, deal.clients?.full_name, deal.clients?.company]
+            .filter(Boolean)
+            .some((value) => value?.toLowerCase().includes(query))
+        );
       }),
-    [deals, ownerFilter, ownerIdFilter, stageFilter, viewFilter]
+    [deals, ownerFilter, ownerIdFilter, searchQuery, stageFilter, viewFilter]
   );
 
   const dealsByStage = useMemo(
@@ -149,7 +159,15 @@ export function PipelineBoard() {
   }
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+    <div className="space-y-4">
+      <Input
+        value={searchQuery}
+        placeholder="Search deals by title, client, or company..."
+        aria-label="Search deals"
+        className="max-w-md"
+        onChange={(event) => setSearchQuery(event.target.value)}
+      />
+      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
       {pipelineStatuses
         .filter(
           ({ status }) => !stageFilter || status === stageFilter
@@ -162,6 +180,7 @@ export function PipelineBoard() {
           deals={dealsByStage[status]}
         />
         ))}
+      </div>
     </div>
   );
 }

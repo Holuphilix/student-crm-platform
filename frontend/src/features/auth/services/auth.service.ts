@@ -1,6 +1,6 @@
 import { supabase } from "@/lib/supabase/supabase-client";
 import { assertSupabaseConfigured } from "@/lib/supabase/supabase-client";
-import { apiClient } from "@/lib/api/client";
+import { publicApiClient } from "@/lib/api/client";
 
 import type {
   PasswordRecoveryPayload,
@@ -43,7 +43,7 @@ export async function signUpWithEmail(
   assertSupabaseConfigured();
 
   const registration =
-    await apiClient<RegisterUserResponse>(
+    await publicApiClient<RegisterUserResponse>(
       "/api/auth/register",
       {
         method: "POST",

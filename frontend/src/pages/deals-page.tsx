@@ -14,6 +14,9 @@ import { Input } from "@/components/ui/input";
 import { useClients } from "@/features/clients/hooks/use-clients";
 import { useAuth } from "@/features/auth/hooks/use-auth";
 import { PipelineBoard } from "@/features/deals/components/pipeline-board";
+import { ClientDealOverview } from "@/features/deals/components/client-deal-overview";
+import { PageHeader } from "@/components/common/page-header";
+import { useDeals } from "@/features/deals/hooks/use-deals";
 import { useCreateDeal } from "@/features/deals/hooks/use-deals";
 
 export function DealsPage() {
@@ -21,6 +24,7 @@ export function DealsPage() {
   const isClient = role === "client" || role === "user";
   const { data: clients = [] } = useClients();
   const createDealMutation = useCreateDeal();
+  const { data: deals = [] } = useDeals();
 
   const [clientId, setClientId] = useState("");
   const [title, setTitle] = useState("");
@@ -75,17 +79,12 @@ export function DealsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">
-          {isClient ? "My Deals" : "Deal Pipeline"}
-        </h1>
-
-        <p className="mt-2 text-sm text-muted-foreground">
-          {isClient
-            ? "Track the high-level status of your active applications."
-            : "Track clients across each pipeline stage."}
-        </p>
-      </div>
+      {!isClient ? (
+        <PageHeader
+          title="Deal Pipeline"
+          description="Track clients across each pipeline stage."
+        />
+      ) : null}
 
       {!isClient ? (
         <Card>
@@ -164,7 +163,11 @@ export function DealsPage() {
         </Card>
       ) : null}
 
-      <PipelineBoard />
+      {isClient ? (
+        <ClientDealOverview deals={deals} />
+      ) : (
+        <PipelineBoard />
+      )}
     </div>
   );
 }
