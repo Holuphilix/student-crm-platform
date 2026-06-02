@@ -14,6 +14,7 @@ import { router } from "@/app/router/router";
 
 import { AppErrorBoundary } from "@/components/app-error-boundary";
 import { StartupConfigurationError } from "@/components/startup-configuration-error";
+import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/features/auth/providers/auth-provider";
 import { isSupabaseConfigured } from "@/lib/supabase/supabase-client";
 
@@ -25,7 +26,9 @@ ReactDOM.createRoot(
       {isSupabaseConfigured ? (
         <QueryProvider>
           <AuthProvider>
-            <RouterProvider router={router} />
+            <TooltipProvider>
+              <RouterProvider router={router} />
+            </TooltipProvider>
 
             <Toaster richColors />
           </AuthProvider>

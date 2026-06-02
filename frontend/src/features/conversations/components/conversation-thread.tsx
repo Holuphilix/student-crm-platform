@@ -1,4 +1,5 @@
 import { useEffect, useRef } from "react";
+import { MessageSquare, Sparkles } from "lucide-react";
 
 import { AvatarInitials } from "@/components/common/avatar-initials";
 import { StatusBadge } from "@/components/common/status-badge";
@@ -23,7 +24,6 @@ const messageTimeFormatter = new Intl.DateTimeFormat(
 export function ConversationThread({
   client,
   messages,
-  currentUserId,
 }: ConversationThreadProps) {
   const endOfThreadRef = useRef<HTMLDivElement | null>(
     null
@@ -37,36 +37,50 @@ export function ConversationThread({
 
   if (!client) {
     return (
-      <div className="flex min-h-96 items-center justify-center rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-        Select a client to view the conversation.
+      <div className="flex min-h-96 items-center justify-center rounded-lg border border-dashed bg-background/70 p-8 text-center text-sm text-muted-foreground">
+        <div>
+          <MessageSquare className="mx-auto mb-3 size-9" />
+          <p className="font-medium text-foreground">
+            Select a conversation
+          </p>
+          <p className="mt-1">
+            Choose a client thread to view the message history.
+          </p>
+        </div>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-96 flex-1 flex-col">
-      <div className="border-b px-4 pb-4">
+      <div className="border-b bg-card px-5 pb-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <div className="min-w-0">
-            <h2 className="truncate text-lg font-semibold">
-              {client.full_name}
-            </h2>
+          <div className="flex min-w-0 items-center gap-3">
+            <AvatarInitials
+              name={client.full_name}
+              email={client.email}
+              className="size-10"
+            />
+            <div className="min-w-0">
+              <h2 className="truncate text-lg font-semibold">
+                {client.full_name}
+              </h2>
 
-            <p className="truncate text-sm text-muted-foreground">
-              {client.email}
-            </p>
+              <p className="truncate text-sm text-muted-foreground">
+                {client.email}
+              </p>
+            </div>
           </div>
 
           <StatusBadge status={client.status} />
         </div>
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto px-4 py-4">
+      <div className="flex-1 space-y-5 overflow-y-auto bg-muted/30 px-3 py-5 sm:px-5">
         {messages.length > 0 ? (
           messages.map((message) => {
-            const isOwnMessage =
-              Boolean(currentUserId) &&
-              message.author_id === currentUserId;
+            const isClientMessage =
+              message.sender === "client";
             const roleLabel =
               message.sender === "agent"
                 ? "CRM Team"
@@ -75,45 +89,51 @@ export function ConversationThread({
             return (
               <div
                 key={message.id}
-                className={`flex items-end gap-2 ${
-                  isOwnMessage
+                className={`flex items-end gap-2 sm:gap-3 ${
+                  isClientMessage
                     ? "justify-end"
                     : "justify-start"
                 }`}
               >
-                {!isOwnMessage ? (
+                {!isClientMessage ? (
                   <AvatarInitials
                     name={roleLabel}
-                    className="size-8"
+                    className="size-8 bg-primary/10 text-primary"
                   />
                 ) : null}
                 <div
-                  className={`max-w-[85%] rounded-lg px-3 py-2 text-sm md:max-w-[70%] ${
-                    isOwnMessage
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
+                  className={`max-w-[82%] rounded-lg px-4 py-3 text-sm leading-6 shadow-md md:max-w-[68%] ${
+                    isClientMessage
+                      ? "rounded-br-sm bg-primary text-primary-foreground"
+                      : "rounded-bl-sm bg-card text-foreground ring-1 ring-border"
                   }`}
                 >
+                  <div className="mb-1 flex items-center gap-1.5 text-xs font-semibold opacity-90">
+                    {!isClientMessage ? (
+                      <Sparkles className="size-3.5" />
+                    ) : null}
+                    {roleLabel}
+                  </div>
                   <p className="whitespace-pre-wrap break-words">
                     {message.message}
                   </p>
 
                   <p
-                    className={`mt-1 text-xs ${
-                      isOwnMessage
+                    className={`mt-2 text-[11px] ${
+                      isClientMessage
                         ? "text-primary-foreground/70"
                         : "text-muted-foreground"
                     }`}
                   >
-                    {isOwnMessage ? "You" : roleLabel} -{" "}
                     {messageTimeFormatter.format(
                       new Date(message.created_at)
                     )}
                   </p>
                 </div>
-                {isOwnMessage ? (
+                {isClientMessage ? (
                   <AvatarInitials
-                    name="You"
+                    name={client.full_name}
+                    email={client.email}
                     className="size-8 bg-primary text-primary-foreground"
                   />
                 ) : null}
@@ -121,8 +141,16 @@ export function ConversationThread({
             );
           })
         ) : (
-          <div className="flex min-h-52 items-center justify-center rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-            No messages yet.
+          <div className="flex min-h-52 items-center justify-center rounded-lg border border-dashed bg-background/70 p-8 text-center text-sm text-muted-foreground">
+            <div>
+              <MessageSquare className="mx-auto mb-3 size-8" />
+              <p className="font-medium text-foreground">
+                No messages yet
+              </p>
+              <p className="mt-1">
+                Send the first message to begin this CRM conversation.
+              </p>
+            </div>
           </div>
         )}
 

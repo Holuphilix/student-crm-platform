@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import { Search, SlidersHorizontal } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -160,14 +161,23 @@ export function PipelineBoard() {
 
   return (
     <div className="space-y-4">
-      <Input
-        value={searchQuery}
-        placeholder="Search deals by title, client, or company..."
-        aria-label="Search deals"
-        className="max-w-md"
-        onChange={(event) => setSearchQuery(event.target.value)}
-      />
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <div className="flex flex-col gap-3 rounded-lg border bg-card p-4 shadow-sm transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-2 text-sm font-medium">
+          <SlidersHorizontal className="size-4 text-primary" />
+          Pipeline filters
+        </div>
+        <div className="relative w-full sm:max-w-md">
+          <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+          <Input
+            value={searchQuery}
+            placeholder="Search deals by title, client, or company..."
+            aria-label="Search deals"
+            className="pl-9"
+            onChange={(event) => setSearchQuery(event.target.value)}
+          />
+        </div>
+      </div>
+      <div className="grid items-start gap-4 sm:grid-cols-2 xl:grid-cols-4">
       {pipelineStatuses
         .filter(
           ({ status }) => !stageFilter || status === stageFilter

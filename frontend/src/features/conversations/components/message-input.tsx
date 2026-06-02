@@ -37,13 +37,13 @@ export function MessageInput({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex gap-2 border-t p-4"
+      className="flex items-end gap-2 border-t bg-card p-3 sm:p-4"
     >
       <Textarea
         value={message}
         disabled={disabled || isSending}
         placeholder="Write a message..."
-        className="max-h-36 min-h-10 resize-none"
+        className="max-h-36 min-h-11 resize-none rounded-lg bg-background"
         onChange={(event) =>
           setMessage(event.target.value)
         }
@@ -61,6 +61,7 @@ export function MessageInput({
       <Button
         type="submit"
         size="icon-lg"
+        className="shadow-sm"
         disabled={
           disabled || isSending || message.trim().length === 0
         }

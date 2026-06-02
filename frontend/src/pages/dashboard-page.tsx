@@ -2,6 +2,7 @@ import { AnalyticsDashboard } from "@/features/dashboard/components/analytics-da
 import { ClientDashboard } from "@/features/dashboard/components/client-dashboard";
 import { SalesDashboard } from "@/features/dashboard/components/sales-dashboard";
 import { useAuth } from "@/features/auth/hooks/use-auth";
+import { BadgeCheck } from "lucide-react";
 import {
   getRoleDisplayName,
   getUserDisplayName,
@@ -19,14 +20,21 @@ export function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-bold">
-          Welcome back, {displayName}
-        </h1>
+      <div className="rounded-lg border bg-card p-5 shadow-sm">
+        <div className="flex items-start gap-3">
+          <div className="flex size-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 text-primary">
+            <BadgeCheck className="size-6" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
+              Welcome back, {displayName}
+            </h1>
 
-        <p className="mt-2 text-sm text-muted-foreground">
-          {roleLabel}
-        </p>
+            <p className="mt-2 text-sm text-muted-foreground">
+              {roleLabel}
+            </p>
+          </div>
+        </div>
       </div>
 
       {isClient ? (

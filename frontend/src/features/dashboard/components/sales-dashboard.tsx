@@ -1,4 +1,10 @@
-import { Badge } from "@/components/ui/badge";
+import {
+  BriefcaseBusiness,
+  CheckCircle2,
+  Inbox,
+  MessageSquare,
+} from "lucide-react";
+import type { ComponentType } from "react";
 import { Link } from "react-router-dom";
 import {
   Card,
@@ -12,6 +18,91 @@ import { clientStatuses } from "@/features/clients/types/client.types";
 import { useConversations } from "@/features/conversations/hooks/use-conversations";
 import { useDeals } from "@/features/deals/hooks/use-deals";
 import { formatStageLabel, normalizeStage } from "@/features/deals/utils/stage-format";
+import { cn } from "@/lib/utils";
+
+type SalesMetricCardProps = {
+  title: string;
+  value: number;
+  to: string;
+  icon: ComponentType<{ className?: string }>;
+  accent: "blue" | "orange" | "purple" | "green";
+};
+
+const stageIndicatorStyles: Record<string, string> = {
+  new_lead: "bg-slate-400",
+  contacted: "bg-blue-500",
+  consultation_booked: "bg-violet-500",
+  documents_requested: "bg-orange-500",
+  application_started: "bg-yellow-500",
+  submitted: "bg-cyan-500",
+  won: "bg-emerald-500",
+  lost: "bg-red-500",
+};
+
+const metricAccentStyles: Record<
+  SalesMetricCardProps["accent"],
+  {
+    card: string;
+    icon: string;
+  }
+> = {
+  blue: {
+    card: "border-t-4 border-t-blue-500",
+    icon: "bg-blue-50 text-blue-600",
+  },
+  orange: {
+    card: "border-t-4 border-t-orange-500",
+    icon: "bg-orange-50 text-orange-600",
+  },
+  purple: {
+    card: "border-t-4 border-t-violet-500",
+    icon: "bg-violet-50 text-violet-600",
+  },
+  green: {
+    card: "border-t-4 border-t-emerald-500",
+    icon: "bg-emerald-50 text-emerald-600",
+  },
+};
+
+function SalesMetricCard({
+  title,
+  value,
+  to,
+  icon: Icon,
+  accent,
+}: SalesMetricCardProps) {
+  const styles = metricAccentStyles[accent];
+
+  return (
+    <Link to={to} className="block rounded-lg">
+      <Card
+        className={cn(
+          "h-full cursor-pointer hover:-translate-y-0.5 hover:shadow-lg",
+          styles.card
+        )}
+      >
+        <CardHeader className="flex-row items-center justify-between gap-3">
+          <CardTitle className="text-sm text-muted-foreground">
+            {title}
+          </CardTitle>
+          <div
+            className={cn(
+              "flex size-10 items-center justify-center rounded-lg",
+              styles.icon
+            )}
+          >
+            <Icon className="size-5" />
+          </div>
+        </CardHeader>
+        <CardContent>
+          <p className="text-3xl font-bold">
+            {value}
+          </p>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+}
 
 export function SalesDashboard() {
   const { user } = useAuth();
@@ -59,90 +150,64 @@ export function SalesDashboard() {
   return (
     <div className="space-y-6">
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-        <Link to="/conversations" className="block rounded-lg">
-        <Card className="rounded-lg cursor-pointer transition hover:bg-muted/40">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              My Assigned Conversations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">
-              {assignedConversations.length}
-            </p>
-          </CardContent>
-        </Card>
-        </Link>
-
-        <Link to="/conversations?filter=unassigned" className="block rounded-lg">
-        <Card className="rounded-lg cursor-pointer transition hover:bg-muted/40">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Unassigned Conversations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">
-              {unassignedConversations.length}
-            </p>
-          </CardContent>
-        </Card>
-        </Link>
-
-        <Link to="/deals?filter=active" className="block rounded-lg">
-        <Card className="rounded-lg cursor-pointer transition hover:bg-muted/40">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              My Active Deals
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">
-              {activeDeals.length}
-            </p>
-          </CardContent>
-        </Card>
-        </Link>
-
-        <Link to="/deals?stage=won" className="block rounded-lg">
-        <Card className="rounded-lg cursor-pointer transition hover:bg-muted/40">
-          <CardHeader>
-            <CardTitle className="text-sm font-medium">
-              Won Deals
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-3xl font-bold">
-              {wonDeals.length}
-            </p>
-          </CardContent>
-        </Card>
-        </Link>
+        <SalesMetricCard
+          title="My Assigned Conversations"
+          value={assignedConversations.length}
+          to="/conversations"
+          icon={MessageSquare}
+          accent="blue"
+        />
+        <SalesMetricCard
+          title="Unassigned Conversations"
+          value={unassignedConversations.length}
+          to="/conversations?filter=unassigned"
+          icon={Inbox}
+          accent="orange"
+        />
+        <SalesMetricCard
+          title="My Active Deals"
+          value={activeDeals.length}
+          to="/deals?filter=active"
+          icon={BriefcaseBusiness}
+          accent="purple"
+        />
+        <SalesMetricCard
+          title="Won Deals"
+          value={wonDeals.length}
+          to="/deals?stage=won"
+          icon={CheckCircle2}
+          accent="green"
+        />
       </div>
 
-      <Card className="rounded-lg">
+      <Card>
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <BriefcaseBusiness className="size-5 text-primary" />
             Pipeline Summary
           </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
             {stageCounts.map(({ stage, count }) => (
-              <div
+              <Link
                 key={stage}
-                className="flex items-center justify-between rounded-lg border p-3 transition hover:bg-muted/40"
+                to={`/deals?stage=${stage}`}
+                className="flex items-center justify-between rounded-lg border bg-background/70 p-3 transition-all duration-200 hover:-translate-y-0.5 hover:bg-muted/60 hover:shadow-md"
               >
-                <Link
-                  to={`/deals?stage=${stage}`}
-                  className="flex w-full items-center justify-between"
-                >
                   <span className="text-sm font-medium">
+                    <span
+                      className={cn(
+                        "mr-2 inline-block size-2 rounded-full",
+                        stageIndicatorStyles[stage]
+                      )}
+                    />
                     {formatStageLabel(stage)}
                   </span>
-                  <Badge variant="secondary">{count}</Badge>
-                </Link>
-              </div>
+                  <span className="rounded-full bg-muted px-2.5 py-1 text-xs font-semibold">
+                    {count}
+                  </span>
+              </Link>
             ))}
           </div>
         </CardContent>

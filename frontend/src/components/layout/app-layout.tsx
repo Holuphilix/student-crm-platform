@@ -30,15 +30,17 @@ export function AppLayout({
     <SidebarProvider>
       <AppSidebar />
 
-      <SidebarInset>
+      <SidebarInset className="bg-background">
         <AppHeader />
 
-        <main className="flex-1 p-6">
-          <div className="mb-4">
+        <main className="flex-1 px-4 py-5 sm:px-6 lg:px-8">
+          <div className="mb-5">
             <SidebarTrigger />
           </div>
 
-          {children}
+          <div className="mx-auto max-w-7xl">
+            {children}
+          </div>
         </main>
       </SidebarInset>
     </SidebarProvider>

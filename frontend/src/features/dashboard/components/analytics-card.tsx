@@ -19,6 +19,43 @@ type AnalyticsCardProps = {
   to?: string;
 };
 
+const analyticsAccentStyles: Record<
+  string,
+  {
+    card: string;
+    icon: string;
+  }
+> = {
+  "Assigned Conversations": {
+    card: "border-t-4 border-t-blue-500",
+    icon: "bg-blue-50 text-blue-600",
+  },
+  "My Assigned Conversations": {
+    card: "border-t-4 border-t-blue-500",
+    icon: "bg-blue-50 text-blue-600",
+  },
+  "Total Conversations": {
+    card: "border-t-4 border-t-blue-500",
+    icon: "bg-blue-50 text-blue-600",
+  },
+  "Unassigned Conversations": {
+    card: "border-t-4 border-t-orange-500",
+    icon: "bg-orange-50 text-orange-600",
+  },
+  "Active Deals": {
+    card: "border-t-4 border-t-violet-500",
+    icon: "bg-violet-50 text-violet-600",
+  },
+  "My Active Deals": {
+    card: "border-t-4 border-t-violet-500",
+    icon: "bg-violet-50 text-violet-600",
+  },
+  "Won Deals": {
+    card: "border-t-4 border-t-emerald-500",
+    icon: "bg-emerald-50 text-emerald-600",
+  },
+};
+
 export function AnalyticsCard({
   title,
   value,
@@ -26,21 +63,26 @@ export function AnalyticsCard({
   isLoading = false,
   to,
 }: AnalyticsCardProps) {
+  const accent = analyticsAccentStyles[title] ?? {
+    card: "border-t-4 border-t-primary/60",
+    icon: "bg-primary/10 text-primary",
+  };
+
   const card = (
     <Card
       className={
         to && !isLoading
-          ? "rounded-lg cursor-pointer transition hover:bg-muted/40"
-          : "rounded-lg"
+          ? `h-full cursor-pointer hover:-translate-y-0.5 hover:shadow-lg ${accent.card}`
+          : `h-full ${accent.card}`
       }
     >
       <CardHeader className="flex-row items-center justify-between gap-3">
-        <CardTitle className="text-sm text-muted-foreground">
+        <CardTitle className="text-sm font-semibold text-muted-foreground">
           {title}
         </CardTitle>
 
-        <div className="flex size-9 items-center justify-center rounded-lg bg-muted">
-          <Icon className="h-4 w-4 text-foreground" />
+        <div className={`flex size-10 items-center justify-center rounded-lg ${accent.icon}`}>
+          <Icon className="h-5 w-5" />
         </div>
       </CardHeader>
 
@@ -48,7 +90,7 @@ export function AnalyticsCard({
         {isLoading ? (
           <Skeleton className="h-8 w-20" />
         ) : (
-          <p className="text-3xl font-semibold">
+          <p className="text-3xl font-bold tracking-tight">
             {value.toLocaleString()}
           </p>
         )}
@@ -63,7 +105,7 @@ export function AnalyticsCard({
   return (
     <Link
       to={to}
-      className="block rounded-lg transition hover:-translate-y-0.5 hover:shadow-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+      className="block rounded-lg transition hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
     >
       {card}
     </Link>

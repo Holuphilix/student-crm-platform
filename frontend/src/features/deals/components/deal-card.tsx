@@ -69,7 +69,7 @@ export function DealCard({ deal }: DealCardProps) {
   return (
     <Card
       size="sm"
-      className="rounded-lg bg-background shadow-none"
+      className="bg-background shadow-xs transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
     >
       <CardHeader className="gap-2">
         <div className="flex items-start justify-between gap-3">
@@ -105,7 +105,7 @@ export function DealCard({ deal }: DealCardProps) {
           <select
             value={normalizedStage}
             disabled={updateStageMutation.isPending}
-            className="h-8 w-full rounded-lg border border-input bg-background px-2 text-sm"
+            className="h-9 w-full rounded-lg border border-input bg-card px-2 text-sm shadow-xs transition hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
             onChange={(event) =>
               handleStageChange(
                 event.target.value as DealStage
@@ -125,6 +125,7 @@ export function DealCard({ deal }: DealCardProps) {
             asChild
             variant="outline"
             size="sm"
+            className="w-full"
           >
             <Link to={`/deals/${deal.id}`}>
               Open workspace

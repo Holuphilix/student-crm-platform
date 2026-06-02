@@ -1,4 +1,10 @@
 import { useState } from "react";
+import {
+  BriefcaseBusiness,
+  CalendarClock,
+  DollarSign,
+  UserRound,
+} from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -89,7 +95,8 @@ export function DealsPage() {
       {!isClient ? (
         <Card>
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <BriefcaseBusiness className="size-5 text-primary" />
             Create Deal
           </CardTitle>
         </CardHeader>
@@ -99,26 +106,29 @@ export function DealsPage() {
             onSubmit={handleCreateDeal}
             className="grid gap-4 md:grid-cols-2"
           >
-            <select
-              value={clientId}
-              className="h-8 w-full rounded-lg border border-input bg-background px-2 text-sm"
-              onChange={(event) =>
-                setClientId(event.target.value)
-              }
-            >
-              <option value="">
-                Select client
-              </option>
-
-              {clients.map((client) => (
-                <option
-                  key={client.id}
-                  value={client.id}
-                >
-                  {client.full_name}
+            <div className="relative">
+              <UserRound className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <select
+                value={clientId}
+                className="h-9 w-full rounded-lg border border-input bg-card pl-9 pr-3 text-sm shadow-xs"
+                onChange={(event) =>
+                  setClientId(event.target.value)
+                }
+              >
+                <option value="">
+                  Select client
                 </option>
-              ))}
-            </select>
+
+                {clients.map((client) => (
+                  <option
+                    key={client.id}
+                    value={client.id}
+                  >
+                    {client.full_name}
+                  </option>
+                ))}
+              </select>
+            </div>
 
             <Input
               value={title}
@@ -128,23 +138,31 @@ export function DealsPage() {
               }
             />
 
-            <Input
-              value={valueAmount}
-              type="number"
-              min="0"
-              placeholder="Deal value"
-              onChange={(event) =>
-                setValueAmount(event.target.value)
-              }
-            />
+            <div className="relative">
+              <DollarSign className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={valueAmount}
+                type="number"
+                min="0"
+                placeholder="Deal value"
+                className="pl-9"
+                onChange={(event) =>
+                  setValueAmount(event.target.value)
+                }
+              />
+            </div>
 
-            <Input
-              value={expectedIntake}
-              placeholder="Expected intake"
-              onChange={(event) =>
-                setExpectedIntake(event.target.value)
-              }
-            />
+            <div className="relative">
+              <CalendarClock className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={expectedIntake}
+                placeholder="Expected intake"
+                className="pl-9"
+                onChange={(event) =>
+                  setExpectedIntake(event.target.value)
+                }
+              />
+            </div>
 
             <div className="md:col-span-2">
               <Button

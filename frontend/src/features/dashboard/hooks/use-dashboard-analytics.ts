@@ -18,12 +18,12 @@ const dashboardAnalyticsQueryKey = [
 ];
 
 const pipelineStageColors: Record<ClientStatus, string> = {
-  new_lead: "#2563eb",
-  contacted: "#0891b2",
+  new_lead: "#64748b",
+  contacted: "#2563eb",
   consultation_booked: "#7c3aed",
-  documents_requested: "#ca8a04",
-  application_started: "#ea580c",
-  submitted: "#0f766e",
+  documents_requested: "#f97316",
+  application_started: "#eab308",
+  submitted: "#06b6d4",
   won: "#16a34a",
   lost: "#dc2626",
 };

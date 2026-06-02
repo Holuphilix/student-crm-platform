@@ -1,4 +1,4 @@
-import { LogOut } from "lucide-react";
+import { LogOut, ShieldCheck } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
@@ -49,19 +49,22 @@ export function AppHeader() {
   }
 
   return (
-    <header className="border-b bg-background px-6 py-4">
+    <header className="border-b bg-card/90 px-4 py-4 shadow-xs backdrop-blur sm:px-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-2xl font-bold">
-            Student CRM Platform
-          </h1>
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="size-5 text-primary" />
+            <h1 className="text-xl font-bold sm:text-2xl">
+              Student CRM Platform
+            </h1>
+          </div>
 
           <p className="text-sm text-muted-foreground">
             Education sales management system
           </p>
         </div>
 
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="flex flex-col gap-3 rounded-lg border bg-background/60 p-3 shadow-xs sm:flex-row sm:items-center sm:border-0 sm:bg-transparent sm:p-0 sm:shadow-none">
           <AvatarInitials
             name={displayName}
             email={displayEmail}

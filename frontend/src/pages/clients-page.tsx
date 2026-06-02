@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Link } from "react-router-dom";
+import { Search, UserPlus, Users } from "lucide-react";
 import { toast } from "sonner";
 
 import { AvatarInitials } from "@/components/common/avatar-initials";
@@ -102,7 +103,8 @@ export function ClientsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <UserPlus className="size-5 text-primary" />
             Create Client
           </CardTitle>
         </CardHeader>
@@ -162,24 +164,34 @@ export function ClientsPage() {
       <Card>
         <CardHeader>
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <CardTitle>Client Directory</CardTitle>
-            <Input
-              value={searchQuery}
-              placeholder="Search clients..."
-              aria-label="Search clients"
-              className="sm:max-w-xs"
-              onChange={(event) => setSearchQuery(event.target.value)}
-            />
+            <CardTitle className="flex items-center gap-2">
+              <Users className="size-5 text-primary" />
+              Client Directory
+            </CardTitle>
+            <div className="relative sm:w-80">
+              <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={searchQuery}
+                placeholder="Search clients..."
+                aria-label="Search clients"
+                className="pl-9"
+                onChange={(event) => setSearchQuery(event.target.value)}
+              />
+            </div>
           </div>
         </CardHeader>
 
         <CardContent>
           {isLoading ? (
-            <p>Loading clients...</p>
+            <p className="text-sm text-muted-foreground">Loading clients...</p>
           ) : filteredClients.length === 0 ? (
-            <p className="rounded-lg border border-dashed p-6 text-center text-sm text-muted-foreground">
-              No clients match your current search.
-            </p>
+            <div className="rounded-lg border border-dashed bg-background/70 p-8 text-center">
+              <Users className="mx-auto mb-3 size-8 text-muted-foreground" />
+              <p className="font-medium">No clients found</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Try a different search or create a new CRM client.
+              </p>
+            </div>
           ) : (
             <Table>
               <TableHeader>

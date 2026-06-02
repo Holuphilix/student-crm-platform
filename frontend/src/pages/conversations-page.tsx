@@ -1,5 +1,11 @@
 import { useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
+import {
+  Inbox,
+  MessageSquare,
+  Search,
+  UserCheck,
+} from "lucide-react";
 
 import { toast } from "sonner";
 
@@ -271,6 +277,7 @@ export function ConversationsPage() {
               </>
             ) : (
               <div className="p-8 text-center">
+                <MessageSquare className="mx-auto mb-3 size-8 text-muted-foreground" />
                 <p className="font-medium">
                   No conversations yet.
                 </p>
@@ -284,6 +291,7 @@ export function ConversationsPage() {
                     setIsStartingConversation(true)
                   }
                 >
+                  <MessageSquare className="mr-2 size-4" />
                   Start Conversation
                 </Button>
               </div>
@@ -293,29 +301,35 @@ export function ConversationsPage() {
       ) : hasError ? (
         <Card>
           <CardContent className="py-6">
-            <p className="text-sm text-destructive">
+            <div className="flex items-center gap-3 text-sm text-destructive">
+              <Inbox className="size-5" />
               Failed to load conversations.
-            </p>
+            </div>
           </CardContent>
         </Card>
       ) : (
         <div className="grid gap-4 lg:grid-cols-[320px_minmax(0,1fr)]">
-          <Card className="rounded-lg">
+          <Card>
             <CardHeader className="border-b">
               <div className="space-y-3">
-                <CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <MessageSquare className="size-5 text-primary" />
                   {isSales ? "Conversation Queue" : "Clients"}
                 </CardTitle>
-                <Input
-                  value={searchQuery}
-                  placeholder="Search conversations..."
-                  aria-label="Search conversations"
-                  onChange={(event) => setSearchQuery(event.target.value)}
-                />
+                <div className="relative">
+                  <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
+                  <Input
+                    value={searchQuery}
+                    placeholder="Search conversations..."
+                    aria-label="Search conversations"
+                    className="pl-9"
+                    onChange={(event) => setSearchQuery(event.target.value)}
+                  />
+                </div>
               </div>
             </CardHeader>
 
-            <CardContent className="max-h-[72vh] overflow-y-auto">
+            <CardContent className="max-h-[46vh] overflow-y-auto lg:max-h-[72vh]">
               {isLoading ? (
                 <p className="text-sm text-muted-foreground">
                   Loading conversations...
@@ -336,7 +350,7 @@ export function ConversationsPage() {
             </CardContent>
           </Card>
 
-          <Card className="min-h-[72vh] rounded-lg">
+          <Card className="lg:min-h-[72vh]">
             <CardContent className="flex flex-1 flex-col px-0">
               {isLoading ? (
                 <div className="flex min-h-96 items-center justify-center p-6 text-sm text-muted-foreground">
@@ -355,7 +369,8 @@ export function ConversationsPage() {
                       {isSelectedConversationUnassigned ? (
                         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                           <div>
-                            <p className="text-sm font-medium">
+                            <p className="flex items-center gap-2 text-sm font-medium">
+                              <Inbox className="size-4 text-primary" />
                               Unassigned Conversation
                             </p>
                             <p className="text-xs text-muted-foreground">
@@ -370,6 +385,7 @@ export function ConversationsPage() {
                             }
                             onClick={handleAssignToMe}
                           >
+                            <UserCheck className="mr-2 size-4" />
                             {isAssigningConversation
                               ? "Assigning..."
                               : "Assign to Me"}
@@ -397,14 +413,14 @@ export function ConversationsPage() {
                           </p>
                         </div>
 
-                        <div className="flex gap-2">
+                        <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row">
                           <select
                             value={
                               selectedConversation.assigned_to ??
                               ""
                             }
                             disabled={isAssigningConversation}
-                            className="h-9 min-w-56 rounded-lg border border-input bg-background px-3 text-sm"
+                            className="h-9 w-full min-w-0 rounded-lg border border-input bg-background px-3 text-sm shadow-xs transition hover:border-primary/40 focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 sm:min-w-56"
                             onChange={(event) =>
                               handleAssignConversation(
                                 event.target.value
